@@ -9,7 +9,9 @@ high-level tasks.
 
 [VirtualHome](http://virtual-home.org/)
 
-## How To Run
+[AirSim](https://microsoft.github.io/AirSim/)
+
+## How To Run with VirtualHome
 In addition to the code in this repository, anyone looking to run the real 
 VirtualHome simulator will need to clone the 
 [VirtualHome repository](https://github.com/xavierpuigf/virtualhome) in the top 
@@ -22,7 +24,7 @@ how to do so can be found in the
 [s(CASP) README](https://gitlab.software.imdea.org/ciao-lang/sCASP). 
 
 To run the program, the VirtualHome executable will have to be on and allowed
-to access network traffic. After turning it on, the main.py file can be run. The 
+to access network traffic. After turning it on, the main_virtualhome.py file can be run. The 
 first thirty lines of the main method are various parameters concerning levels
 of static analysis, which task to perform, and some quality of life features.
 
@@ -78,6 +80,18 @@ in a simulated environment.
 ### iclp_mini_example.pl
 This file contains the code in Section 3.3 of the ICLP 2025 paper used to get 
 the first suggested action.
+
+## How to Run with AirSim
+AirSim will need to be run as instructed in the [AirSim documentation](https://microsoft.github.io/AirSim/build_windows/). 
+Because AirSim is no longer being supported, it is difficult to run on anything other than Windows. As s(CASP) can
+only be run easily on Unix-based machines, we provide an option to run VECSR in a server-client connection, where 
+VECSR can function as a s(CASP) server on a s(CASP)-enabled machine and an AirSim-connected client on a Windows machine
+using a simple TCP socket. 
+
+To run VECSR as a s(CASP) server, use scasp_server.py, and to run on a machine with AirSim run main_airsim.py.
+
+### Simulation Video
+A demonstration video is available and linked here: [Video](https://drive.google.com/file/d/1dLcAfDx14L6Kk7PUr7tecDVNdlx4ec46/view?usp=sharing)
 
 # How to Cite VECSR
 **In Publications:**
