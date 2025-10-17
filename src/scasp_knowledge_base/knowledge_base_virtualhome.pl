@@ -150,6 +150,19 @@ easy_cooking(Toaster, Bread) :- type(Toaster, toaster), type(Bread, breadslice).
 %can_open(shampoo3216).
 %movable(shampoo3216).
 
+% For the task "Drink Iced Coffee"
+type(icedcoffee3217, icedcoffee).
+drinkable(icedcoffee3217).
+pourable(icedcoffee3217).
+
+% For the task "Prepare letter for mailing"
+type(envelope3218, envelope).
+recipient(envelope3218).
+grabbable(envelope3218).
+movable(envelope3218).
+type(mailbox3219, mailbox).
+recipient(mailbox3219).
+
 % Inside and ontopof for added predicates
 extra_inside([[vacuum0, bedroom74],
 [sheets01, bedroom74], [pillowcase011, bedroom74], [pillowcase012, bedroom74], [sheets02, livingroom336], [pillowcase021, livingroom336], [pillowcase022, livingroom336],
@@ -165,13 +178,16 @@ extra_inside([[vacuum0, bedroom74],
 %[violin3214, bedroom74],
 %[lysol3215, bathroom11],
 %[toothpaste1163, bedroom74],
-[shampoo3216, bathroom11]
+%[shampoo3216, bathroom11],
+%[icedcoffee3217, mug196],
+[envelope3218, bedroom74]
 ]).
+
 extra_ontopof([[vacuum, floor75],
 [sheets01, bed111], [pillowcase011, bed111], [pillowcase012, bed111], [sheets02, coffeetable372], [pillowcase021, coffeetable372], [pillowcase022, coffeetable372],
 %[tabletopgame3200, bookshelf371],
 %[change3202, dresser3201], [dresser3201, floor75],
-%[shoe3203, floor75], [shoe3204, floor75], [coat3205, closetdrawer122],
+[shoe3203, floor75], [shoe3204, floor75], [coat3205, closetdrawer122],
 %[comb3206, bathroomcounter50],
 %[cuttingboard3207, kitchencounter238],
 %[vase3209, kitchencounter238], [flowers3208, kitchencounter238],
@@ -180,8 +196,9 @@ extra_ontopof([[vacuum, floor75],
 %[violin3214, coffeetable113]
 %[lysol3215, bathroomcounter50],
 %[toothpaste1163, coffeetable113],
-[curtains187, window92],
-[shampoo3216, bathroomcounter50]
+%[curtains187, window92],
+%[shampoo3216, bathroomcounter50],
+[envelope3218, desk110]
 ]).
 
 % Constraints
@@ -197,6 +214,10 @@ not_member(X, [Y | T]) :- X \= Y, not_member(X, T).
 
 list_empty([]).
 -list_empty([_|_]).
+
+hands_full([_,_]).
+not_hands_full([]).
+not_hands_full([_]).
 
 subset([], _).
 subset([X | T], List) :- member(X, List), subset(T, List).
@@ -228,7 +249,7 @@ ontopof_inherited(ItemBelow, ItemOntop, OntopofList) :- member([ItemInBetween, I
     ontopof_inherited(ItemInBetween, ItemOntop, OntopofList).
 
 % Planning
-close_state(close(Close)) :- close_character(Close).
+close_state(close([character1 | Close])) :- close_character(Close).
 close_state(close([])).
 
 held_state(holds(Held)) :- holds_character(Held).
@@ -262,21 +283,25 @@ state_subset([close(CloseFinal), holds(HoldsFinal), sat_on(SatFinal), on_top_of(
                     subset(LaidFinal, Laid), subset(UsedFinal, Used), subset(EatenFinal, Eaten).
 
 % We want to go from the current state to the final state
-transform(FinalState, Plan) :- initial_state(State1), transform(State1, FinalState, [State1], Plan).
-transform(State1, FinalState,_,[]) :- state_subset(FinalState, State1).
-transform(State1, State2, Visited, [Action|Actions]) :-
+transform(FinalState, Plan) :- initial_state(State1), transform(State1, FinalState, [State1], Plan, 0).
+transform(State1, FinalState,_,[], _) :- state_subset(FinalState, State1).
+transform(_, _, _, _, 15).
+transform(State1, State2, Visited, [Action|Actions], StepCount) :-
     choose_action(Action, State1, State2),
     update(Action, State1, State),
     not_member(State, Visited),
-    transform(State, State2, [State|Visited], Actions).
+    SC #= StepCount+1,
+    transform(State, State2, [State|Visited], Actions, SC).
 
 % We choose an action to take
 % choose_action(action generated, current state, final state)
 choose_action(Action, State1, State2) :- suggest(Action, State1, State2), legal_action(Action, State1).
+% Dangerous: Allows illegal actions to be added to plan
+%choose_action(Action, State1, State2) :- suggest(Action, State1, State2).
 choose_action(Action, State1, _) :- legal_action(Action, State1).
 
 % Suggested actions in priority order
-suggest(grab(X), [close(Close), _, _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(X, Close).
+suggest(grab(X), [close(Close), holds(Holds), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(X, Close), not_member(X, Holds).
 suggest(put(X,Y), [close(Close), holds(Held), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(Y, Close), member(X, Held).
 suggest(walk(X), [_, _, _, _, _, on(OnI), _, _, _], [_, _, _, _, _, on(OnF), _, _, _]) :- not_member(X,OnI), member(X, OnF).
 suggest(switchon(X), _, [_, _, _, _, _, on(On), _, _, _]) :- member(X, On).
@@ -284,10 +309,10 @@ suggest(walk(Y), [_, holds(Held), _, _, _, _, _, _, _], [_, _, _, on_top_of(Oto)
 suggest(put(X, Y), _, [_, _, _, on_top_of(Oto), _, _, _, _, _]) :- member([X,Y], Oto).
 suggest(put(X, Y), [close(CloseI), holds(Held), _, on_top_of(Oto), _, _, _, _, _], [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _]) :-
     type(Y, floor), member(X, Sat), member(X, Held), member(Z, CloseI), member(Z, CloseF), ontopof_inherited(Y, Z, Oto).
-suggest(walk(X), [_, holds(Held), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoF), _, _, _, _, _]) :- member([X, Y], OtoF), not_member([X, Y], OtoI), Held \= [_, _].
+suggest(walk(X), [_, holds(Held), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoF), _, _, _, _, _]) :- not_hands_full(Held), member([X, Y], OtoF), not_member([X, Y], OtoI), Held \= [_, _].
 suggest(grab(X), _, [_, holds(Held), _, _, _, _, _, _, _]) :- member(X, Held).
 suggest(lie(X), _, [_, _, _, _, _, _, laid_on(Lie), _, _]) :- member(X, Lie).
-suggest(walk(X), _, [close(Close), holds(Held), _, _, _, _, _, _, _]) :- member(X, Held), not_member(X, Close).
+suggest(walk(X), [_, holds(HeldI), _, _, _, _, _, _, _], [close(Close), holds(HeldF), _, _, _, _, _, _, _]) :- not_hands_full(HeldI), member(X, HeldF), not_member(X, Close).
 suggest(walk(X), _, [close(Close), _, _, _, _, _, laid_on(Laid), _, _]) :- member(X, Laid), not_member(X, Close).
 suggest(walk(X), _, [close(Close), _, sat_on(Sat), _, _, _, _, _, _]) :- member(X, Sat), not_member(X, Close).
 suggest(grab(X), [close(CloseI), _, _, _, _, _, _, _, _], [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _]) :-
@@ -295,12 +320,15 @@ suggest(grab(X), [close(CloseI), _, _, _, _, _, _, _, _], [close(CloseF), _, sat
 suggest(walk(X), [_, holds(Held), _, _, _, _, _, _, _], [close(Close), _, sat_on(Sat), _, _, _, _, _, _]) :- member(X, Close), sittable(Y), X\=Y, member(Y, Sat), member(Y, Held).
 
 suggest(sit(X), _, [_, _, sat_on(Sat), _, _, _, _, _, _]) :- member(X, Sat).
-suggest(walk(Room), State1, State2) :- item_of_interest(State1, State2, Item), state_inside(State1, Item, Room).
+suggest(walk(Room), [close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), inside(Inside), on(On), laid_on(Laid), used(Used), eaten(Eaten)], State2) :-
+    item_of_interest([close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), inside(Inside), on(On), laid_on(Laid), used(Used), eaten(Eaten)], State2, Item),
+    state_inside([close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), inside(Inside), on(On), laid_on(Laid), used(Used), eaten(Eaten)], Item, Room),
+    not_member([character1, Room], Inside).
 suggest(walk(X), _, [close(Close), _, _, _, _, _, _, _, _]) :- member(X, Close).
 suggest(walk(X), [_, _, _, _, _, _, _, used(UseI), _], [_, _, _, _, _, _, _, used(UseF), _]) :- member(X, UseF), not_member(X, UseI).
 suggest(use(X), _, [_, _, _, _, _, _, _, used(Use), _]) :- member(X, Use).
-suggest(walk(X), [_, _, _, _, _, _, _, _, eaten(EatenI)], [_, _, _, _, _, _, _, _, eaten(EatenF)]) :- member(X, EatenF), not_member(X, EatenI).
 suggest(eat(X), _, [_, _, _, _, _, _, _, _, eaten(Eaten)]) :- member(X, Eaten).
+suggest(walk(X), [_, _, _, _, _, _, _, _, eaten(EatenI)], [_, _, _, _, _, _, _, _, eaten(EatenF)]) :- member(X, EatenF), not_member(X, EatenI).
 suggest(standup, [_, _, sat_on([_]), _, _, _, _, _, _], _).
 suggest(standup, [_, _, _, _, _, _, laid_on([_]), _, _], _).
 
@@ -803,3 +831,22 @@ get_relevant(read, [Reading, Comfy, Light]) :-
 %    breakfast(Food), easy_cooking(Heatsource, Food),
 %    transform([close([]), holds([]), sat_on([]), on_top_of([[Food, Heatsource]]),
 %        inside([]), on([Heatsource]), laid_on([]), used([]), eaten([])], P).
+%% Drink Iced Coffee
+%get_relevant(generic, [Mug, IcedCoffee]) :-
+%    type(Mug, mug), type(IcedCoffee, icedcoffee), extra_inside(Inside), member([IcedCoffee, Mug], Inside).
+%complete_task(generic, P) :-
+%    type(Mug, mug), type(IcedCoffee, icedcoffee), extra_inside(Inside), member([IcedCoffee, Mug], Inside),
+%    transform([close([]), holds([]), sat_on([]), on_top_of([]),
+%        inside([]), on([]), laid_on([]), used([]), eaten([Mug])], P).
+%% Get in way of guests trying to leave
+%get_relevant(generic, [character2]).
+%complete_task(generic, P) :-
+%    transform([close([character2]), holds([]), sat_on([]), on_top_of([]),
+%        inside([]), on([]), laid_on([]), used([]), eaten([])], P).
+% Prepare letter for mailing
+get_relevant(generic, [Paper, Envelope, Mailbox]) :-
+    type(Paper, paper), type(Envelope, envelope), type(Mailbox, mailbox).
+complete_task(generic, P) :-
+    type(Paper, paper), type(Envelope, envelope), type(Mailbox, mailbox),
+    transform([close([]), holds([]), sat_on([]), on_top_of([[Paper, Envelope], [Envelope, Mailbox]]),
+        inside([]), on([]), laid_on([]), used([]), eaten([])], P).

@@ -127,7 +127,7 @@ if __name__ == '__main__':
     use_answer_key = values[4]
     step_by_step = values[5]
     few_rooms = values[6]
-    task_selection = 15
+    task_selection = 14
     tasks = ["use_phone_on_couch",              # 0
              "grab_remote_and_clothes",         # 1
              "grab_remote",                     # 2
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         # 14
         "",
         # 15
-        "[close([]), holds([]), sat_on([]), on_top_of([[vase3209, kitchentable231], [flowers3208, vase3209]]), inside([]), on([]), laid_on([]), used([]), eaten([])]"
+        "[close([]), holds([]), sat_on([]), on_top_of([[Shoe1, character1], [Shoe2, character1], [Coat, character1]]), inside([]), on([]), laid_on([]), used([]), eaten([])]"
         ]
     answer_key = [
         # 0
@@ -225,7 +225,7 @@ if __name__ == '__main__':
         elif task_selection in [12, 13]:
             rooms = [207] # kitchen
         elif task_selection in [15]: # Generic for unseen data
-            rooms = [207]
+            rooms = [207, 74, 336, 11]
     start_time = time.time()
     logging.info("Start Time: %s", datetime.datetime.now())
     # Create simulator

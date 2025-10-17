@@ -19,7 +19,12 @@ def run(task, program, answer=None):
         logging.info("Answer received: %s", answer)
         actions = answer.strip('][ ').split(')')
     logging.info("Plan:")
-    logging.info(actions)
+    # logging.info(actions)
+    print_actions = ""
+    for action in actions:
+        print_actions = print_actions + action + ")"
+    print_actions = print_actions[:-1]
+    logging.info(print_actions)
     for action in actions:
         a = action.replace("(", " ").replace(",", " ").split()
         if a:

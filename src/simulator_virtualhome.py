@@ -42,7 +42,45 @@ class VirtualHomeSimulatorBase(Simulator):
 	def set_rooms(self, rooms):
 		self.rooms = rooms
 
-	def knowledge_graph_to_predicates(self, graph, relevant_items=None, time=False, character_perspective=True):
+	def knowledge_graph_to_predicates_by_item(self, graph):
+		includeCategories = True
+		facts = []
+		ids = {}
+		if not self.rooms:
+			room_nodes = self.check_for_node(graph, category="Rooms")
+		else:
+			room_nodes = []
+			for room in self.rooms:
+				room_nodes.append(self.check_for_node(graph, category="Rooms", identifier=room)[0])
+		for room in room_nodes:
+			for node in graph['nodes']:
+				if not self.check_for_edge(graph, to_id=room["id"], from_id=node["id"], relation_type="INSIDE")\
+						and not node == room:
+					continue
+				identifier = node['class_name'] + str(node['id'])
+				ids[node['id']] = identifier
+				id_state = (identifier, node['class_name'])
+				for state in node['states']:
+					id_state = id_state + (state.lower(),)
+				for propert in node["properties"]:
+					id_state = id_state + (propert.lower(),)
+				if includeCategories:
+					id_state = id_state + (node["category"].lower(),)
+				for edge in self.check_for_edge(graph, from_id=node['id'], to_id=1):
+					if "ON" == edge["relation_type"]:
+						id_state = id_state + ("ontopof",)
+					elif "HOLDS_LH" == edge["relation_type"] or "HOLDS_RH" == edge["relation_type"]:
+						id_state = id_state + ("holds",)
+					else:
+						id_state = id_state + (edge["relation_type"].lower(),)
+				facts.append([id_state])
+
+		return facts
+
+
+	def knowledge_graph_to_predicates(self, graph, relevant_items=None, time=False, character_perspective=True, by_item=False):
+		if by_item:
+			return self.knowledge_graph_to_predicates_by_item(graph)
 		includeType = True
 		includeState = True
 		includeProperties = True
@@ -271,14 +309,14 @@ class VirtualHomeSimulator(VirtualHomeSimulatorBase):
 		_, g = self.comm.environment_graph()
 		return g
 
-	def get_state(self, relevant=None):
+	def get_state(self, relevant=None, by_item=False):
 		"""
 		A method that returns the current state of the environment in the form
 		of Prolog facts of the form [(fact, parameter, ...)]
 		:return: a list of prolog facts [[(fact)], [(fact2)], ...]
 		"""
 		s, g = self.comm.environment_graph()
-		facts = self.knowledge_graph_to_predicates(g, relevant_items=relevant)
+		facts = self.knowledge_graph_to_predicates(g, relevant_items=relevant, by_item=by_item)
 		return facts
 
 	def get_actions(self):

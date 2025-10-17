@@ -5,7 +5,7 @@ from time import sleep
 
 
 class ScaspHarness():
-	def __init__(self, simulator, initial_rules=None, optimize_rules=False, rooms=None, scasp_client=None):
+	def __init__(self, simulator, initial_rules=None, optimize_rules=False, rooms=None, scasp_client=None, by_item=False):
 		if simulator:
 			self.simulator = simulator
 			if simulator.which_simulator() == "VirtualHome":
@@ -25,6 +25,7 @@ class ScaspHarness():
 		self.objects = {}
 		self.relevant_items = None
 		self.scasp_client = scasp_client
+		self.by_item = by_item
 
 	def get_scasp(self):
 		"""
@@ -32,7 +33,7 @@ class ScaspHarness():
 		initial rules
 		"""
 		if self.simulator.which_simulator() == "VirtualHome":
-			self.rules = self.simulator.get_state(self.relevant_items)
+			self.rules = self.simulator.get_state(self.relevant_items, by_item=self.by_item)
 		elif self.simulator.which_simulator() == "AirSim":
 			self.rules = self.simulator.get_state()
 
