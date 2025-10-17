@@ -1,9 +1,6 @@
 time(1).
 time(2).
 time(3).
-time(4).
-time(5).
-time(6).
 type(bathroom11, bathroom).
 rooms(bathroom11).
 type(bedroom74, bedroom).
@@ -15,12 +12,11 @@ rooms(livingroom336).
 type(character1, character).
 characters(character1).
 inside(character1, kitchen207, 0).
-inside(character1, kitchen207, 1).
-inside(character1, kitchen207, 2).
-inside(character1, kitchen207, 3).
-inside(character1, kitchen207, 4).
-inside(character1, kitchen207, 5).
-inside(character1, kitchen207, 6).
+inside(character1, bedroom74, 1).
+inside(character1, bedroom74, 2).
+close(character1, light1, 2).
+inside(character1, bedroom74, 3).
+close(character1, light1, 3).
 type(book192, book).
 grabbable(book192).
 can_open(book192).
@@ -39,23 +35,8 @@ closed(book192, 2).
 inside(book192, bedroom74, 2).
 close(book192, character1, 2).
 closed(book192, 3).
-held(book192, 3).
 inside(book192, bedroom74, 3).
 close(book192, character1, 3).
-open(book192, 4).
-held(book192, 4).
-inside(book192, bedroom74, 4).
-close(book192, character1, 4).
-open(book192, 5).
-held(book192, 5).
-used(book192, 5).
-inside(book192, bedroom74, 5).
-close(book192, character1, 5).
-closed(book192, 6).
-held(book192, 6).
-used(book192, 6).
-inside(book192, bedroom74, 6).
-close(book192, character1, 6).
 type(chair109, chair).
 grabbable(chair109).
 sittable(chair109).
@@ -70,12 +51,7 @@ inside(chair109, bedroom74, 2).
 close(chair109, character1, 2).
 inside(chair109, bedroom74, 3).
 close(chair109, character1, 3).
-inside(chair109, bedroom74, 4).
-close(chair109, character1, 4).
-inside(chair109, bedroom74, 5).
-close(chair109, character1, 5).
-inside(chair109, bedroom74, 6).
-close(chair109, character1, 6).
+type(light1, light).
 % General Rules
 time(0).
 :- held(X, T), held(Y, T), held(Z, T), X \= Y, X \= Z, Y \= Z.
@@ -140,6 +116,9 @@ action_valid(lie, X, T) :- not sitting(character1, T), not laying(character1, T)
 action_valid(open, X, T) :- can_open(X), closed(X, T), close(character1, X, T), reachable(X, T), not action_invalid(open, X, T).
 action_valid(close, X, T) :- can_open(X), open(X, T), close(character1, X, T), reachable(X, T), not action_invalid(close, X, T).
 action_valid(move, X, T) :- movable(X), close(character1, X, T), reachable(X, T), not action_invalid(move, X, T).
+action_valid(turn_to, X, T) :- reachable(X, T), not action_invalid(turn_to, X, T).
+action_valid(point, X, T) :- not action_invalid(point, X, T).
+
 
 action_invalid(find, X, T) :- T2 .<. T, action_done(walk, X, T2).
 action_invalid(find, X, T) :- T2 .<. T, action_done(grab, X, T2).
@@ -169,13 +148,12 @@ action(lie).
 action(open).
 action(close).
 action(move).
+action(turn_to).
+action(point).
 
 #show action_done/3, not action_valid/3.
 
-action_done(find,book192,0).
-action_done(find,chair109,1).
-action_done(grab,book192,2).
-action_done(open,book192,3).
-action_done(use,book192,4).
+action_done(walk,bedroom74,0).
+action_done(walk,light1,1).
 
-?- action_possible(close,book192,5).
+?- action_possible(find,light1,2).

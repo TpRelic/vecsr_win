@@ -30,24 +30,6 @@ def vecsr_put_shoes_and_coat(objects):
 
 	return objects, actions
 
-def huang_change_sheets_and_pillowcases(objects):
-	# bed111
-	objects.append(VHObject("bed", 111, surfaces=True, sittable=True, lieable=True, furniture=True, inside=["bedroom74"], ontopof=["floor76"]))
-	# sheets1
-	objects.append(VHObject("sheets", 1, grabbable=True, movable=True, inside=["bedroom74"], ontopof=["bed111"]))
-	# pillow11
-	objects.append(VHObject("pillow", 11, grabbable=True, movable=True, inside=["bedroom74"]))
-	#Task: Change sheets and pillowcases
-	# Step 1: Walk to bedroom
-	# Step 2: Walk to bed
-	# Step 3: Find sheets
-	# Step 4: Grab sheets
-	# Step 5: Find pillow
-	# Step 6: Grab pillow
-	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "bed111"), Action(3, "find", "sheets1"),
-	           Action(4, "grab", "sheets1"), Action(5, "find", "pillow11"), Action(6, "grab", "pillow11")]
-	return objects, actions
-
 def vecsr_have_iced_coffee(objects):
 	# mug196
 	objects.append(VHObject("mug", 196, grabbable=True, recipient=True, pourable=True, movable=True, props=True,
@@ -399,4 +381,188 @@ def gpt_read(objects):
 	# Step 8: Save your progress or finish the material.
 	actions = [Action(1, "find", "book192"), Action(2, "find", "chair109"), Action(3, "grab", "book192"),
 	           Action(4, "open", "book192"), Action(5, "use", "book192"), Action(6, "close", "book192")]
+	return objects, actions
+
+def huang_go_to_sleep(objects):
+	# bed111
+	objects.append(
+		VHObject("bed", 111, surfaces=True, sittable=True, lieable=True, furniture=True, inside=["bedroom74"],
+		         ontopof=["floor76"]))
+	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "bed111"), Action(3, "lie", "bed111"),
+	           Action(4, "use", "bed111")]
+	return objects, actions
+
+def huang_browse_internet(objects):
+	# chair109
+	objects.append(VHObject("chair", 109, surfaces=True, grabbable=True, sittable=True, movable=True, furniture=True,
+	                        inside=["bedroom74"], close=["computer176", "mouse172", "desk110"]))
+	# computer176
+	objects.append(VHObject("computer", 176, off=True, has_switch=True, lookable=True, electronics=True,
+	                        inside=["bedroom74"], close=["chair109", "mouse172", "desk110"]))
+	# mouse172
+	objects.append(VHObject("mouse", 172, grabbable=True, has_plug=True, movable=True, electronics=True,
+	                        inside=["bedroom74"], close=["chair109", "computer176", "desk110"]))
+	# desk110
+	objects.append(VHObject("desk", 110, closed=True, surfaces=True, can_open=True, movable=True, furniture=True,
+	                        inside=["bedroom74"], close=["chair109", "computer176", "mouse172"]))
+
+	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "desk110"), Action(3, "find", "chair109"),
+	           Action(4, "sit", "chair109"), Action(5, "find", "computer176"), Action(6, "switch_on", "computer176"),
+	           Action(7, "find", "mouse172"), Action(8, "grab", "mouse172"), Action(9, "turn_to", "computer176"),
+	           Action(10, "point", "computer176")]
+	return objects, actions
+
+def huang_wash_teeth(objects):
+	# bathroomcounter50
+	objects.append(VHObject("bathroomcounter", 50, closed=True, surfaces=True, furniture=True,
+	                        inside=["bathroom11"], close=["faucet51"]))
+	# faucet51
+	objects.append(VHObject("faucet", 51, off=True, has_switch=True, furniture=True,
+	                        inside=["bathroom11"], close=["bathroomcounter50", "toothpaste63"]))
+	# toothbrush66
+	objects.append(VHObject("toothbrush", 66, grabbable=True, recipient=True, movable=True, props=True,
+	                        inside=["bathroom11"], close=[]))
+	# toothpaste63
+	objects.append(VHObject("toothpaste", 63, closed=True, grabbable=True, pourable=True, can_open=True, movable=True,
+	                        cream=True, props=True, inside=["bathroom11"], close=["bathroomcounter50", "faucet51"]))
+
+	actions = [Action(1, "walk", "bathroom11"), Action(2, "walk", "bathroomcounter50"), Action(3, "find", "faucet51"),
+	           Action(4, "switch_on", "faucet51"), Action(5, "walk", "toothbrush66"), Action(6, "grab", "toothbrush66")]
+	return objects, actions
+
+def huang_brush_teeth(objects):
+	# bathroomcounter50
+	objects.append(VHObject("bathroomcounter", 50, closed=True, surfaces=True, furniture=True,
+	                        inside=["bathroom11"], close=["faucet51", "toothbrush66", "toothpaste63"]))
+	# faucet51
+	objects.append(VHObject("faucet", 51, off=True, has_switch=True, furniture=True,
+	                        inside=["bathroom11"], close=["bathroomcounter50", "toothbrush66", "toothpaste63"]))
+	# toothbrush66
+	objects.append(VHObject("toothbrush", 66, grabbable=True, recipient=True, movable=True, props=True,
+	                        inside=["bathroom11"], close=["bathroomcounter50", "faucet51", "toothpaste63"]))
+	# toothpaste63
+	objects.append(VHObject("toothpaste", 63, closed=True, grabbable=True, pourable=True, can_open=True, movable=True,
+	                        cream=True, props=True, inside=["bathroom11"], close=["bathroomcounter50", "faucet51", "toothbrush66"]))
+
+	actions = [Action(1, "find", "toothbrush66"), Action(2, "turn_to", "toothbrush66"), Action(3, "point", "toothbrush66"),
+	           Action(4, "use", "toothbrush66")]
+	return objects, actions
+
+def huang_vacuum(objects):
+	# vacuum10
+	objects.append(VHObject("vacuum,", 10, has_switch=True, grabbable=True, has_plug=True, movable=True, off=True,
+	                        inside=["bedroom74", "dresser3201"]))
+	# dresser3201
+	objects.append(VHObject("dresser", 3201, surfaces=True, movable=True, inside=["bedroom74"]))
+
+	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "dresser3201"), Action(3, "open", "dresser3201"),
+	           Action(4, "find", "vacuum10"), Action(5, "grab", "vacuum10"), Action(6, "switch_on", "vacuum10")]
+	return objects, actions
+
+def huang_change_sheets_and_pillowcases(objects):
+	# bed111
+	objects.append(VHObject("bed", 111, surfaces=True, sittable=True, lieable=True, furniture=True,
+	                        inside=["bedroom74"], ontopof=["floor76"], close=["sheets1", "pillow11"]))
+	# sheets1
+	objects.append(VHObject("sheets", 1, grabbable=True, movable=True,
+	                        inside=["bedroom74"], ontopof=["bed111"], close=["bed111", "pillow11"]))
+	# pillow11
+	objects.append(VHObject("pillow", 11, grabbable=True, movable=True,
+	                        inside=["bedroom74"], close=["sheets1", "bed111"]))
+	#Task: Change sheets and pillowcases
+	# Step 1: Walk to bedroom
+	# Step 2: Walk to bed
+	# Step 3: Find sheets
+	# Step 4: Grab sheets
+	# Step 5: Find pillow
+	# Step 6: Grab pillow
+	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "bed111"), Action(3, "find", "sheets1"),
+	           Action(4, "grab", "sheets1"), Action(5, "find", "pillow11"), Action(6, "grab", "pillow11")]
+	return objects, actions
+
+def huang_wash_dirty_dishes(objects):
+	objects[-1].inside=["bedroom74"]
+	# sink247
+	objects.append(VHObject("sink", 247, recipient=True, containers=True, furniture=True,
+	                        inside=["kitchen207"], close=["faucet249", "washingsponge267", "plate278", "dishsoap268", "towel68"]))
+	# plate278
+	objects.append(VHObject("plate", 278, surfaces=True, grabbable=True, recipient=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["faucet249", "washingsponge267", "sink247", "dishsoap268", "towel68"]))
+	# faucet249
+	objects.append(VHObject("faucet", 249, off=True, has_switch=True, furniture=True,
+	                        inside=["kitchen207"], close=["plate278", "washingsponge267", "sink247", "dishsoap268", "towel68"]))
+	# washingsponge267
+	objects.append(VHObject("washingsponge", 267, grabbable=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["plate278", "faucet249", "sink247", "dishsoap268", "towel68"]))
+	# dishsoap268
+	objects.append(VHObject("dishsoap", 268, grabbable=True, movable=True, pourable=True,
+	                        inside=["kitchen207"], close=["plate278", "faucet249", "sink247", "washingsponge267", "towel68"]))
+	# towel68
+	objects.append(VHObject("towel", 68, grabbable=True, cover_object=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["plate278", "faucet249", "sink247", "washingsponge267", "dishsoap268"]))
+
+	actions = [Action(1, "walk", "kitchen207"), Action(2, "walk", "sink247"), Action(3, "find", "faucet249"),
+	           Action(4, "switch_on", "faucet249"), Action(5, "walk", "plate278"), Action(6, "grab", "plate278")]
+	return objects, actions
+
+def huang_feed_me(objects):
+	objects[-1].inside = ["bedroom74"]
+	# kitchentable231
+	objects.append(VHObject("kitchentable", 231, surfaces=True, movable=True, furniture=True,
+	                        inside=["kitchen207"], close=["bench232", "plate278", "creamybuns334"]))
+	# bench232
+	objects.append(VHObject("bench", 232, surfaces=True, sittable=True, lieable=True, movable=True, furniture=True,
+	                        inside=["kitchen207"], close=["kitchentable231", "plate278", "creamybuns334"]))
+	# plate278
+	objects.append(VHObject("plate", 278, surfaces=True, grabbable=True, recipient=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["bench232", "kitchentable231", "creamybuns334"]))
+	# creamybuns334
+	objects.append(VHObject("creamybuns", 334, grabbable=True, eatable=True, cuttable=True, movable=True, food=True,
+	                        inside=["kitchen207"], close=["bench232", "plate278", "kitchentable231"]))
+
+	actions = [Action(1, "walk", "kitchen207"), Action(2, "walk", "kitchentable231"), Action(3, "find", "kitchentable231")] # abridged
+	return objects, actions
+
+def huang_breakfast(objects):
+	objects[-1].inside = ["bedroom74"]
+	# kitchentable231
+	objects.append(VHObject("kitchentable", 231, surfaces=True, movable=True, furniture=True,
+	                        inside=["kitchen207"], close=["bench232", "plate278", "creamybuns334", "cutleryfork277"]))
+	# bench232
+	objects.append(VHObject("bench", 232, surfaces=True, sittable=True, lieable=True, movable=True, furniture=True,
+	                        inside=["kitchen207"], close=["kitchentable231", "plate278", "creamybuns334", "cutleryfork277"]))
+	# plate278
+	objects.append(VHObject("plate", 278, surfaces=True, grabbable=True, recipient=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["bench232", "kitchentable231", "creamybuns334", "cutleryfork277"]))
+	# cutleryfork277
+	objects.append(VHObject("cutleryfork", 277, grabbable=True, movable=True, props=True,
+	                        inside=["kitchen207"], close=["bench232", "kitchentable231", "creamybuns334", "plate278"]))
+	# creamybuns334
+	objects.append(VHObject("creamybuns", 334, grabbable=True, eatable=True, cuttable=True, movable=True, food=True,
+	                        inside=["kitchen207"], close=["fridge306"]))
+	# fridge306
+	objects.append(VHObject("fridge", 306, closed=True, can_open=True, has_switch=True, containers=True, has_plug=True, appliances=True,
+	                       inside=["kitchen207"], close=["creamybuns334"]))
+
+	actions = [Action(1, "walk", "kitchen207"), Action(2, "walk", "fridge306"), Action(3, "find", "fridge306")] # abridged
+	return objects, actions
+
+def huang_read(objects):
+	# book192
+	objects.append(VHObject("book", 192, closed=True, grabbable=True, cuttable=True, can_open=True, readable=True,
+	                        has_paper=True, movable=True, props=True, inside=["bedroom74"], close=["character1"]))
+	# chair109
+	objects.append(VHObject("chair", 109, surfaces=True, grabbable=True, sittable=True, movable=True, furniture=True,
+	                        inside=["bedroom74"], close=["character1"]))
+	objects.append(VHObject("light", 1)) # abridged
+	# Task: Read - 66.67%
+	# Step 1: Choose what to read (e.g., book, article, e-book).
+	# Step 2: Find a comfortable reading environment.
+	# Step 3: Gather necessary tools (e.g., bookmark, device, notebook).
+	# Step 4: Open the material to the correct page or section.
+	# Step 5: Begin reading at your own pace.
+	# Step 6: Take breaks if needed to avoid fatigue.
+	# Step 7: Reflect on or summarize what you’ve read.
+	# Step 8: Save your progress or finish the material.
+	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "light1"), Action(3, "find", "light1")]
 	return objects, actions

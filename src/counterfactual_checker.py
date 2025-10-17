@@ -330,7 +330,7 @@ if __name__ == '__main__':
 	# character1
 	objects.append(VHObject("character", 1, characters=True, inside=["kitchen207"]))
 
-	# Possible setups
+	# Some possible setups (others stored elsewhere for size convenience)
 	# objects, actions = cfc_helper.vecsr_put_shoes_and_coat(objects)
 	# objects, actions = cfc_helper.huang_change_sheets_and_pillowcases(objects)
 	# objects, actions = cfc_helper.vecsr_have_iced_coffee(objects)
@@ -341,11 +341,20 @@ if __name__ == '__main__':
 	# objects, actions = cfc_helper.gpt_wash_teeth(objects)
 	# objects, actions = cfc_helper.gpt_brush_teeth(objects)
 	# objects, actions = cfc_helper.gpt_vacuum(objects)
-	# objects, actions = cfc_helper.gpt_change_sheets_and_pillow_cases(objects)
 	# objects, actions = cfc_helper.gpt_wash_dirty_dishes(objects)
 	# objects, actions = cfc_helper.gpt_feed_me(objects)
 	# objects, actions = cfc_helper.gpt_breakfast(objects)
-	objects, actions = cfc_helper.gpt_read(objects)
+	# objects, actions = cfc_helper.gpt_read(objects)
+	# objects, actions = cfc_helper.huang_go_to_sleep(objects)
+	# objects, actions = cfc_helper.huang_browse_internet(objects)
+	# objects, actions = cfc_helper.huang_wash_teeth(objects)
+	# objects, actions = cfc_helper.huang_brush_teeth(objects)
+	# objects, actions = cfc_helper.huang_vacuum(objects)
+	# objects, actions = cfc_helper.huang_change_sheets_and_pillowcases(objects)
+	# objects, actions = cfc_helper.huang_wash_dirty_dishes(objects)
+	# objects, actions = cfc_helper.huang_feed_me(objects)
+	# objects, actions = cfc_helper.huang_breakfast(objects)
+	objects, actions = cfc_helper.huang_read(objects)
 
 	rules = ""
 	for action in actions:

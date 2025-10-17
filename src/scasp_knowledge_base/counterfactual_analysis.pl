@@ -62,6 +62,9 @@ action_valid(lie, X, T) :- not sitting(character1, T), not laying(character1, T)
 action_valid(open, X, T) :- can_open(X), closed(X, T), close(character1, X, T), reachable(X, T), not action_invalid(open, X, T).
 action_valid(close, X, T) :- can_open(X), open(X, T), close(character1, X, T), reachable(X, T), not action_invalid(close, X, T).
 action_valid(move, X, T) :- movable(X), close(character1, X, T), reachable(X, T), not action_invalid(move, X, T).
+action_valid(turn_to, X, T) :- reachable(X, T), not action_invalid(turn_to, X, T).
+action_valid(point, X, T) :- not action_invalid(point, X, T).
+
 
 action_invalid(find, X, T) :- T2 .<. T, action_done(walk, X, T2).
 action_invalid(find, X, T) :- T2 .<. T, action_done(grab, X, T2).
@@ -91,5 +94,7 @@ action(lie).
 action(open).
 action(close).
 action(move).
+action(turn_to).
+action(point).
 
 #show action_done/3, not action_valid/3.
