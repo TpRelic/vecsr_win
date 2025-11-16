@@ -34,7 +34,7 @@ if __name__ == '__main__':
         with open(filename, "w") as f:
             f.write(str(data))
         sleep(1)
-        output = scasprunner.run_generated_scasp()
+        output, _ = scasprunner.run_generated_scasp()
         if output:
             print("Success!")
             message = "s"

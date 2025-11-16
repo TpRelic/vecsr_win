@@ -69,19 +69,19 @@ easy_cooking(Toaster, Bread) :- type(Toaster, toaster), type(Bread, breadslice).
 %type(change3202, change).
 %grabbable(change3202).
 %
-%% For the task "Put shoes and coats"
-%type(shoe3203, shoe).
-%clothes(shoe3203).
-%grabbable(shoe3203).
-%movable(shoe3203).
-%type(shoe3204, shoe).
-%clothes(shoe3204).
-%grabbable(shoe3204).
-%movable(shoe3204).
-%type(coat3205, coat).
-%clothes(coat3205).
-%grabbable(coat3205).
-%movable(coat3205).
+% For the task "Put shoes and coats"
+type(shoe3203, shoe).
+clothes(shoe3203).
+grabbable(shoe3203).
+movable(shoe3203).
+type(shoe3204, shoe).
+clothes(shoe3204).
+grabbable(shoe3204).
+movable(shoe3204).
+type(coat3205, coat).
+clothes(coat3205).
+grabbable(coat3205).
+movable(coat3205).
 %
 %% For the task "Hair"
 %type(comb3206, comb).
@@ -168,7 +168,7 @@ extra_inside([[vacuum0, bedroom74],
 [sheets01, bedroom74], [pillowcase011, bedroom74], [pillowcase012, bedroom74], [sheets02, livingroom336], [pillowcase021, livingroom336], [pillowcase022, livingroom336],
 %[tabletopgame3200, livingroom336],
 %[dresser3201, bedroom74], [change3202, bedroom74],
-%[shoe3203, bedroom74], [shoe3204, bedroom74], [coat3205, bedroom74],
+[shoe3203, bedroom74], [shoe3204, bedroom74], [coat3205, bedroom74],
 %[comb3206, bathroom11],
 %[cuttingboard3207, kitchen207],
 %[vase3209, kitchen207], [flowers3208, kitchen207],
@@ -285,7 +285,7 @@ state_subset([close(CloseFinal), holds(HoldsFinal), sat_on(SatFinal), on_top_of(
 % We want to go from the current state to the final state
 transform(FinalState, Plan) :- initial_state(State1), transform(State1, FinalState, [State1], Plan, 0).
 transform(State1, FinalState,_,[], _) :- state_subset(FinalState, State1).
-transform(_, _, _, _, 15).
+transform(_, _, _, _, 30).
 transform(State1, State2, Visited, [Action|Actions], StepCount) :-
     choose_action(Action, State1, State2),
     update(Action, State1, State),
@@ -297,8 +297,11 @@ transform(State1, State2, Visited, [Action|Actions], StepCount) :-
 % choose_action(action generated, current state, final state)
 choose_action(Action, State1, State2) :- suggest(Action, State1, State2), legal_action(Action, State1).
 % Dangerous: Allows illegal actions to be added to plan
-%choose_action(Action, State1, State2) :- suggest(Action, State1, State2).
+%dangerxchoose_action(Action, State1, State2) :- suggest(Action, State1, State2).
 choose_action(Action, State1, _) :- legal_action(Action, State1).
+
+% Insert new suggestions here
+%new_suggestrx
 
 % Suggested actions in priority order
 suggest(grab(X), [close(Close), holds(Holds), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(X, Close), not_member(X, Holds).
@@ -318,7 +321,6 @@ suggest(walk(X), _, [close(Close), _, sat_on(Sat), _, _, _, _, _, _]) :- member(
 suggest(grab(X), [close(CloseI), _, _, _, _, _, _, _, _], [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _]) :-
     not_member(Y, CloseI), member(Y, CloseF), member(X, Sat), -list_empty(CloseF).
 suggest(walk(X), [_, holds(Held), _, _, _, _, _, _, _], [close(Close), _, sat_on(Sat), _, _, _, _, _, _]) :- member(X, Close), sittable(Y), X\=Y, member(Y, Sat), member(Y, Held).
-
 suggest(sit(X), _, [_, _, sat_on(Sat), _, _, _, _, _, _]) :- member(X, Sat).
 suggest(walk(Room), [close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), inside(Inside), on(On), laid_on(Laid), used(Used), eaten(Eaten)], State2) :-
     item_of_interest([close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), inside(Inside), on(On), laid_on(Laid), used(Used), eaten(Eaten)], State2, Item),
@@ -395,6 +397,9 @@ legal_action(eat(X), [_, holds(Held), _, _, _, _, _, _, eaten(Eaten)]) :-
 legal_action(eat(X), [close(Close), _, _, on_top_of(Oto), _, on(On), _, _, eaten(Eaten)]) :-
     member(X, Close), not_member(X, Eaten), can_cook(Heat), ontopof_inherited(Heat, X, Oto), member(Heat, On).
 
+% Insert new legal actions here:
+%new_legal_actionrx
+
 % Update state
 % If we walk to something, anything we are not holding is no longer close
 update(walk(X), [close(Close), holds(Held), sat_on(Sat), on_top_of(Oto), inside(In), on(On), laid_on(Laid), used(Used), eaten(Eaten)],
@@ -424,6 +429,7 @@ update(eat(X), [close(Close), holds(Held), sat_on(Sat), on_top_of(Oto), inside(I
 %update(eat(X), [close(Close), holds(Held), sat_on(Sat), on_top_of(Oto), inside(In), on(On), laid_on(Laid), used(Used), eaten(Eaten)],
 %               [close(CloseN), holds(HeldN), sat_on(Sat), on_top_of(OtoN), inside(InN), on(On), laid_on(Laid), used(Used), eaten([X | Eaten])]) :-
 %    remove(X, Close, CloseN), remove(X, Held, HeldN), remove([X,_], Oto, OtoN), remove([X, _], In, InN).
+update(_, X, X).
 
 
 % Example test queries:
@@ -844,9 +850,9 @@ get_relevant(read, [Reading, Comfy, Light]) :-
 %    transform([close([character2]), holds([]), sat_on([]), on_top_of([]),
 %        inside([]), on([]), laid_on([]), used([]), eaten([])], P).
 % Prepare letter for mailing
-get_relevant(generic, [Paper, Envelope, Mailbox]) :-
+get_relevant(prepare_letter_for_mailing, [Paper, Envelope, Mailbox]) :-
     type(Paper, paper), type(Envelope, envelope), type(Mailbox, mailbox).
-complete_task(generic, P) :-
+complete_task(prepare_letter_for_mailing, P) :-
     type(Paper, paper), type(Envelope, envelope), type(Mailbox, mailbox),
     transform([close([]), holds([]), sat_on([]), on_top_of([[Paper, Envelope], [Envelope, Mailbox]]),
         inside([]), on([]), laid_on([]), used([]), eaten([])], P).

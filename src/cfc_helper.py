@@ -1,4 +1,345 @@
-from counterfactual_checker import VHObject, Action
+rooms = ["bathroom11", "bedroom74", "kitchen207", "livingroom336"]
+
+class Action:
+	def __init__(self, time, action, object="none"):
+		self.time = time
+		self.action = action
+		self.object = object
+
+	def get_scasp(self, include_action=True):
+		rule = "time(" + str(self.time) + ").\n"
+		if include_action:
+			rule = rule + "action_done(" + self.action + ", " + self.object + ", " + str(self.time) + ").\n"
+		return rule
+
+class VHObject:
+	def __init__(self, type, number,
+	             grabbable=False, eatable=False, can_open=False, sittable=False,
+	             lieable=False, movable=False, surfaces=False, has_switch=False,
+	             rooms=False, floor=False, walls=False, ceiling=False,
+	             decor=False, cover_object=False, lamps=False, furniture=False,
+	             containers=False, doors=False, props=False, pourable=False,
+	             cream=False, recipient=False, windows=False, has_plug=False,
+	             electronics=False, appliances=False, hangable=False, clothes=False,
+	             lookable=False, has_paper=False, cuttable=False, readable=False,
+	             characters=False, food=False, drinkable=False,
+	             closed=False, open=False, on=False, off=False, held=False,
+	             sat_on=False, laid_on = False, used=False, eaten=False,
+	             sitting=False, laying=False,
+	             inside=None, ontopof=None, close=None, facing=None):
+		self.name = type + str(number)
+		self.type = type
+		self.number = number
+
+		# Immutable properties
+		self.grabbable = grabbable
+		self.eatable = eatable
+		self.can_open = can_open
+		self.sittable = sittable
+		self.lieable = lieable
+		self.movable = movable
+		self.surfaces = surfaces
+		self.has_switch = has_switch
+		self.rooms = rooms
+		self.floor = floor
+		self.walls = walls
+		self.ceiling = ceiling
+		self.decor = decor
+		self.cover_object = cover_object
+		self.lamps = lamps
+		self.furniture = furniture
+		self.containers = containers
+		self.doors = doors
+		self.props = props
+		self.pourable = pourable
+		self.cream = cream
+		self.recipient = recipient
+		self.windows = windows
+		self.has_plug = has_plug
+		self.electronics = electronics
+		self.appliances = appliances
+		self.hangable = hangable
+		self.clothes = clothes
+		self.lookable = lookable
+		self.has_paper = has_paper
+		self.cuttable = cuttable
+		self.readable = readable
+		self.characters = characters
+		self.food = food
+		self.drinkable = drinkable
+
+		# Temporary states
+		self.closed = closed
+		self.open = open
+		self.on = on
+		self.off = off
+		self.held = held
+		self.sat_on = sat_on
+		self.laid_on = laid_on
+		self.used = used
+		self.eaten = eaten
+		self.sitting = sitting
+		self.laying = laying
+		if inside is None:
+			self.inside = []
+		else:
+			self.inside = inside
+		if ontopof is None:
+			self.ontopof = []
+		else:
+			self.ontopof = ontopof
+		if close is None:
+			self.close = []
+		else:
+			self.close = close
+		if facing is None:
+			self.facing = []
+		else:
+			self.facing = facing
+
+	def get_scasp(self, actions=None):
+		rules = "type(" + self.name + ", " + self.type + ").\n"
+		if self.grabbable:
+			rules = rules + "grabbable(" + self.name + ").\n"
+		if self.eatable:
+			rules = rules + "eatable(" + self.name + ").\n"
+		if self.can_open:
+			rules = rules + "can_open(" + self.name + ").\n"
+		if self.sittable:
+			rules = rules + "sittable(" + self.name + ").\n"
+		if self.lieable:
+			rules = rules + "lieable(" + self.name + ").\n"
+		if self.movable:
+			rules = rules + "movable(" + self.name + ").\n"
+		if self.surfaces:
+			rules = rules + "surfaces(" + self.name + ").\n"
+		if self.has_switch:
+			rules = rules + "has_switch(" + self.name + ").\n"
+		if self.rooms:
+			rules = rules + "rooms(" + self.name + ").\n"
+		if self.floor:
+			rules = rules + "floor(" + self.name + ").\n"
+		if self.walls:
+			rules = rules + "walls(" + self.name + ").\n"
+		if self.ceiling:
+			rules = rules + "ceiling(" + self.name + ").\n"
+		if self.decor:
+			rules = rules + "decor(" + self.name + ").\n"
+		if self.cover_object:
+			rules = rules + "cover_object(" + self.name + ").\n"
+		if self.lamps:
+			rules = rules + "lamps(" + self.name + ").\n"
+		if self.furniture:
+			rules = rules + "furniture(" + self.name + ").\n"
+		if self.containers:
+			rules = rules + "containers(" + self.name + ").\n"
+		if self.doors:
+			rules = rules + "doors(" + self.name + ").\n"
+		if self.props:
+			rules = rules + "props(" + self.name + ").\n"
+		if self.pourable:
+			rules = rules + "pourable(" + self.name + ").\n"
+		if self.cream:
+			rules = rules + "cream(" + self.name + ").\n"
+		if self.recipient:
+			rules = rules + "recipient(" + self.name + ").\n"
+		if self.windows:
+			rules = rules + "windows(" + self.name + ").\n"
+		if self.has_plug:
+			rules = rules + "has_plug(" + self.name + ").\n"
+		if self.electronics:
+			rules = rules + "electronics(" + self.name + ").\n"
+		if self.appliances:
+			rules = rules + "appliances(" + self.name + ").\n"
+		if self.hangable:
+			rules = rules + "hangable(" + self.name + ").\n"
+		if self.clothes:
+			rules = rules + "clothes(" + self.name + ").\n"
+		if self.lookable:
+			rules = rules + "lookable(" + self.name + ").\n"
+		if self.has_paper:
+			rules = rules + "has_paper(" + self.name + ").\n"
+		if self.cuttable:
+			rules = rules + "cuttable(" + self.name + ").\n"
+		if self.readable:
+			rules = rules + "readable(" + self.name + ").\n"
+		if self.characters:
+			rules = rules + "characters(" + self.name + ").\n"
+		if self.food:
+			rules = rules + "food(" + self.name + ").\n"
+		if self.drinkable:
+			rules = rules + "drinkable(" + self.name + ").\n"
+		rules = rules + self.time_scasp_helper(self.name, 0, closed = self.closed, open = self.open, on = self.on, off = self.off,
+	                      held = self.held, sat_on = self.sat_on, laid_on = self.laid_on, used = self.used, eaten = self.eaten,
+	                      sitting = self.sitting, laying = self.laying,
+	                      inside = self.inside, ontopof = self.ontopof, close = self.close, facing = self.facing)
+		if actions:
+			closed = self.closed
+			open = self.open
+			on = self.on
+			off = self.off
+			held = self.held
+			sat_on = self.sat_on
+			laid_on = self.laid_on
+			used = self.used
+			eaten = self.eaten
+			sitting = self.sitting
+			laying = self.laying
+			inside = self.inside
+			ontopof = self.ontopof
+			close = self.close
+			facing = self.facing
+			for action in actions:
+				# If we are a character, do...
+				if self.type == "character":
+					if action.action == "walk" and action.object in rooms:
+						inside = [action.object]
+					elif action.action == "walk":
+						close = [action.object]
+					# elif action.action == "grab":
+					# 	continue
+					elif action.action == "sit":
+						sitting = True
+					elif action.action == "lie":
+						laying = True
+					elif action.action == "standup":
+						sitting = False
+						laying = False
+					# elif action.action == "put":
+					# 	continue
+					# elif action.action == "switch_on":
+					# 	continue
+					# elif action.action == "switch_off":
+					# 	continue
+					# elif action.action == "use":
+					# 	continue
+					# elif action.action == "eat":
+					# 	continue
+					# elif action.action == "open":
+					# 	continue
+					# elif action.action == "close":
+					# 	continue
+				# If the action is being enacted on us...
+				elif self.name == action.object:
+					if action.action == "walk" and held and action.object in rooms:
+						inside = [action.object]
+					elif action.action == "walk" and held:
+						close = [action.object]
+					elif action.action == "grab":
+						held = True
+						ontopof = []
+						inside = [x for x in inside if x in rooms]
+					elif action.action == "sit":
+						sat_on = True
+					elif action.action == "lie":
+						laid_on = True
+					elif action.action == "standup":
+						sat_on = False
+						laid_on = False
+					elif action.action == "switch_on":
+						on = True
+						off = False
+					elif action.action == "switch_off":
+						on = False
+						off = True
+					elif action.action == "use":
+						used = True
+					elif action.action == "eat":
+						eaten = True
+					elif action.action == "open":
+						open = True
+						closed = False
+					elif action.action == "close":
+						open = False
+						closed = True
+				elif held:
+					if action.action == "walk" and action.object in rooms:
+						inside = [action.object, "character1"]
+					elif action.action == "walk":
+						close = [action.object, "character1"]
+					elif action.action == "put":
+						ontopof.append(action.object)
+						held = False
+				elif action.action == "walk" and action.object in close:
+					close.append("character1")
+				rules = rules + self.time_scasp_helper(self.name, action.time, closed=closed, open=open, on=on, off=off,
+				                       held=held, sat_on=sat_on, laid_on=laid_on, used=used,
+				                       eaten=eaten,
+				                       sitting=sitting, laying=laying,
+				                       inside=inside, ontopof=ontopof, close=close, facing=facing)
+		return rules
+
+	@staticmethod
+	def time_scasp_helper(name, time, closed = False, open = False, on = False, off = False,
+	                      held = False, sat_on = False, laid_on = False, used = False, eaten = False,
+	                      sitting = False, laying = False,
+	                      inside = None, ontopof = None, close = None, facing = None):
+		rules = ""
+		if closed:
+			rules = rules + "closed(" + name + ", " + str(time) + ").\n"
+		if open:
+			rules = rules + "open(" + name + ", " + str(time) + ").\n"
+		if on:
+			rules = rules + "on(" + name + ", " + str(time) + ").\n"
+		if off:
+			rules = rules + "off(" + name + ", " + str(time) + ").\n"
+		if held:
+			rules = rules + "held(" + name + ", " + str(time) + ").\n"
+		if sat_on:
+			rules = rules + "sat_on(" + name + ", " + str(time) + ").\n"
+		if laid_on:
+			rules = rules + "laid_on(" + name + ", " + str(time) + ").\n"
+		if used:
+			rules = rules + "used(" + name + ", " + str(time) + ").\n"
+		if eaten:
+			rules = rules + "eaten(" + name + ", " + str(time) + ").\n"
+		if sitting:
+			rules = rules + "sitting(" + name + ", " + str(time) + ").\n"
+		if laying:
+			rules = rules + "laying(" + name + ", " + str(time) + ").\n"
+
+		if inside:
+			for i in inside:
+				rules = rules + "inside(" + name + ", " + i + ", " + str(time) + ").\n"
+		if ontopof:
+			for i in ontopof:
+				rules = rules + "ontopof(" + name + ", " + i + ", " + str(time) + ").\n"
+		if close:
+			for i in close:
+				rules = rules + "close(" + name + ", " + i + ", " + str(time) + ").\n"
+		if facing:
+			for i in facing:
+				rules = rules + "facing(" + name + ", " + i + ", " + str(time) + ").\n"
+		return rules
+
+def get_non_sim_object(object):
+	if object == "shoe3203":
+		return VHObject("shoe", 3203, clothes=True, grabbable=True, movable=True, inside=["bedroom74"], ontopof=["floor75"])
+	if object == "shoe3204":
+		return VHObject("shoe", 3204, clothes=True, grabbable=True, movable=True, inside=["bedroom74"], ontopof=["floor75"])
+	if object == "coat3205":
+		return VHObject("coat", 3205, clothes=True, grabbable=True, movable=True, inside=["bedroom74", "closet114"],
+	                        ontopof=["closetdrawer122"])
+	if object == "floor75":
+		return VHObject("floor", 75, surfaces=True, floor=True, inside=["bedroom74"])
+	if object == "closetdrawer122":
+		return VHObject("closetdrawer", 122, furniture=True, inside=["closet114", "bedroom74"],
+			         ontopof=["closetdrawer125"])
+	if object == "closet114":
+		return VHObject("closet", 114, closed=True, can_open=True, containers=True, furniture=True, inside=["bedroom74"])
+	if object == "mug196":
+		return VHObject("mug", 196, grabbable=True, recipient=True, pourable=True, movable=True, props=True,
+		                        inside=["bedroom74"], ontopof=["desk110"])
+	if object == "icedcoffee3217":
+		return VHObject("icedcoffee", 3217, drinkable=True, pourable=True, inside=["mug196"])
+	if object == "paper303":
+		return VHObject("paper", 303, grabbable=True, readable=True, has_paper=True, movable=True, props=True,
+		                        inside=["kitchen207"],  ontopof=["bookshelf250"])
+	if object == "envelope3218":
+		return VHObject("envelope", 3218, recipient=True, grabbable=True, movable=True, inside=["bedroom74"])
+	if object == "mailbox3219":
+		return VHObject("mailbox", 3219, recipient=True)
+	return None
 
 def vecsr_put_shoes_and_coat(objects):
 	# Put shoes and coat

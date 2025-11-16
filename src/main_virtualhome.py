@@ -4,7 +4,8 @@ import datetime
 
 import scaspharness
 import simulator_virtualhome
-from main_helpers import run, check_results
+from main_helpers import run, check_results, task_helper
+import counterfactual_checker
 
 def state_subset(final_state, curr_state):
     """
@@ -94,15 +95,21 @@ def run_step_by_step(task, final_state, program, state_subset):
     logging.info("Actions taken in simulation: %s seconds" % (time.time() - start_time))
     logging.info("Task End Time: %s", datetime.datetime.now())
 
+def run_cfa(actions, relevant, simulator):
+    objects, actions = counterfactual_checker.format_objects_and_actions(actions, relevant, simulator)
+    counterfactual_checker.counterfactual_checker(objects, actions)
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    values = [True,     # Real simulator or not?
-              True,    # Optimize or not?
-              True,    # Remove unnecessary items or not?
-              False,    # Run dynamically or not?
-              False,    # Use an answer key or not?
-              False,    # Get plans step by step or not?
-              True,    # Only use relevant rooms or not?
+    initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome.pl"
+    values = [True,     # 0 Real simulator or not?
+              True,    # 1 Optimize or not?
+              True,    # 2 Remove unnecessary items or not?
+              False,    # 3 Run dynamically or not?
+              False,    # 4 Use an answer key or not?
+              False,    # 5 Get plans step by step or not?
+              True,    # 6 Only use relevant rooms or not?
+              True  # 7 Counterfactual analysis?
               ]
     best = True
     best_norelitems = False
@@ -112,14 +119,38 @@ if __name__ == '__main__':
     only_opt = False
     only_relrooms = False
     nothing = False
-    if best: values = [True, True, True, False, False, False, True]
-    if best_norelitems: values = [True, True, False, False, False, False, True]
-    if best_noopt: values = [True, False, True, False, False, False, True]
-    if best_norelrooms: values = [True, True, True, False, False, False, False]
-    if only_relitems: values = [True, False, True, False, False, False, False]
-    if only_opt: values = [True, True, False, False, False, False, False]
-    if only_relrooms: values = [True, False, False, False, False, False, True]
-    if nothing: values = [True, False, False, False, False, False, False]
+    if best:
+        values[1] = True
+        values[2] = True
+        values[6] = True
+    if best_norelitems:
+        values[1] = True
+        values[2] = False
+        values[6] = True
+    if best_noopt:
+        values[1] = False
+        values[2] = True
+        values[6] = True
+    if best_norelrooms:
+        values[1] = True
+        values[2] = True
+        values[6] = False
+    if only_relitems:
+        values[1] = False
+        values[2] = True
+        values[6] = False
+    if only_opt:
+        values[1] = True
+        values[2] = False
+        values[6] = False
+    if only_relrooms:
+        values[1] = False
+        values[2] = False
+        values[6] = True
+    if nothing:
+        values[1] = False
+        values[2] = False
+        values[6] = False
     real_simulator = values[0]
     optimize_rules = values[1]
     reduce_items = values[2] # Remove all facts about non-relevant objects
@@ -127,105 +158,10 @@ if __name__ == '__main__':
     use_answer_key = values[4]
     step_by_step = values[5]
     few_rooms = values[6]
-    task_selection = 14
-    tasks = ["use_phone_on_couch",              # 0
-             "grab_remote_and_clothes",         # 1
-             "grab_remote",                     # 2
-             "set_remote_on_coffee_table",      # 3
-             "turn_on_tv",                      # 4
-             # Real Tasks
-             "go_to_sleep",                     # 5
-             "browse_internet",                 # 6
-             "wash_teeth",                      # 7
-             "brush_teeth",                     # 8
-             "vacuum",                          # 9
-             "change_sheets_and_pillow_cases",  # 10
-             "wash_dirty_dishes",               # 11
-             "feed_me",                         # 12
-             "breakfast",                       # 13
-             "read",                            # 14
-             "generic"                          # 15
-             ]
-    final_state = [
-        # 0
-        "",
-        # 1
-        "",
-        # 2
-        "",
-        # 3
-        "",
-        # 4
-        "",
-        # 5
-        "",
-        # 6
-        "[close([cpuscreen177]), holds([]), sat_on([chair109]), on_top_of([]), inside([]), on([computer176]), laid_on([]), used([]), eaten([])]",
-        # 7
-        "",
-        # 8
-        "",
-        # 9
-        "",
-        # 10
-        "",
-        # 11
-        "",
-        # 12
-        "[close([]), holds([]), sat_on([]), on_top_of([[salmon328, fryingpan270], [bellpepper321, fryingpan270], [fryingpan270, stove312]]), inside([]), on([stove312]), laid_on([]), used([]), eaten([salmon328])]",
-        # 13
-        "[close([]), holds([]), sat_on([]), on_top_of([[breadslice310, toaster309]]), inside([]), on([toaster309]), laid_on([]), used([]), eaten([breadslice310])]",
-        # 14
-        "",
-        # 15
-        "[close([]), holds([]), sat_on([]), on_top_of([[Shoe1, character1], [Shoe2, character1], [Coat, character1]]), inside([]), on([]), laid_on([]), used([]), eaten([])]"
-        ]
-    answer_key = [
-        # 0
-        "",
-        # 1
-        "",
-        # 2
-        "",
-        # 3
-        "",
-        # 4
-        "",
-        # 5
-        "",
-        # 6
-        "",
-        # 7
-        "",
-        # 8
-        "",
-        # 9
-        "",
-        # 10
-        "",
-        # 11
-        "[walk(faucet249),switchon(faucet249),walk(bedroom74),walk(wineglass199),grab(wineglass199),walk(plate195),grab(plate195),walk(kitchen207),walk(sink247),put(wineglass199,sink247),put(plate195,sink247)]",
-        # 12
-        "[grab(salmon328),grab(bellpepper321),walk(stove312),switchon(stove312),walk(fryingpan270),put(salmon328,fryingpan270),put(bellpepper321,fryingpan270),eat(salmon328)]",
-        # 13
-        "",
-        # 14
-        "[walk(bedroom74),walk(book192),grab(book192),walk(livingroom336),walk(sofa369),sit(sofa369),use(book192)]"
-                  ]
-    rooms = None
-    if few_rooms:
-        if task_selection in [5, 6, 9]:
-            rooms = [74] # bedroom
-        elif task_selection in [7,8]:
-            rooms = [11] # bathroom
-        elif task_selection in [10, 14]:
-            rooms = [74, 336] # bedroom, livingroom
-        elif task_selection in [11]:
-            rooms = [207, 74] # kitchen, bedroom
-        elif task_selection in [12, 13]:
-            rooms = [207] # kitchen
-        elif task_selection in [15]: # Generic for unseen data
-            rooms = [207, 74, 336, 11]
+    cfa = values[7]
+    task_selection = 15
+    task = "prepare_letter_for_mailing"
+    [final_state, answer_key, rooms] = task_helper(task)
     start_time = time.time()
     logging.info("Start Time: %s", datetime.datetime.now())
     # Create simulator
@@ -234,23 +170,25 @@ if __name__ == '__main__':
     else:
         simulat = simulator_virtualhome.MockVirtualHomeSimulator() # Mock VirtualHome Simulator
     # Create Harness
-    program = scaspharness.ScaspHarness(simulat, initial_rules="scasp_knowledge_base/knowledge_base_virtualhome.pl", optimize_rules=optimize_rules, rooms=rooms)
+    program = scaspharness.ScaspHarness(simulat, initial_rules=initial_rules_file, optimize_rules=optimize_rules, rooms=rooms)
+    if cfa:
+        program.initial_rules = program.initial_rules.replace("%dangerx", "")
     logging.info("Program Initialized Time: %s seconds" % (time.time() - start_time))
     start_time = time.time()
-    if reduce_items:
-        relevant = get_relevant(tasks[task_selection])
+    if reduce_items or cfa:
+        relevant = get_relevant(task)
         program.relevant_items = relevant
     # Full loop
     if step_by_step:
-        run_step_by_step(tasks[task_selection], final_state[task_selection], program, state_subset)
-    elif not dynamic:
+        run_step_by_step(task, final_state, program, state_subset)
+    elif not dynamic or cfa:
         if use_answer_key:
-            run(tasks[task_selection], program, answer_key[task_selection])
+            actions = run(task, program, answer_key, take_actions=not cfa)
         else:
-            run(tasks[task_selection], program)
+            actions = run(task, program, take_actions=not cfa)
+        if cfa:
+            run_cfa(actions, relevant, simulat)
     else:
         while True:
             task = input("Input task:")
-            if task not in tasks:
-                exit(0)
             run(task, program)

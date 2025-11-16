@@ -26,6 +26,7 @@ class ScaspHarness():
 		self.relevant_items = None
 		self.scasp_client = scasp_client
 		self.by_item = by_item
+		self.scasp_runner = "./scasp_knowledge_base/test.sh"
 
 	def get_scasp(self):
 		"""
@@ -117,7 +118,7 @@ class ScaspHarness():
 		f.write("\n\n?- ")
 		f.write(str_query)
 		f.close()
-		result = self.run_generated_scasp(self.scasp_client)
+		result, _ = self.run_generated_scasp(self.scasp_client)
 		if result:
 			logging.info("Success!")
 			logging.debug(result)
@@ -150,8 +151,7 @@ class ScaspHarness():
 		string_rule = string_rule[0:-2] + ")"
 		return string_rule
 
-	@staticmethod
-	def run_generated_scasp(scasp_client=None):
+	def run_generated_scasp(self, scasp_client=None):
 		"""
 		Runs the generated_scasp.pl file
 		:return: results of running the file
@@ -169,8 +169,9 @@ class ScaspHarness():
 				if i % 2 == 0:
 					output[0][item] = data[i + 1]
 		else:
-			output = subprocess.run(["./scasp_knowledge_base/test.sh"], shell=True, capture_output=True, text=True)
+			output = subprocess.run([self.scasp_runner], shell=True, capture_output=True, text=True)
 			output = output.stdout
+			full = output
 			if 'BINDINGS' in output and "BINDINGS: ?" not in output:
 				options = []
 				output = output.split('ANSWER:')[1:]
@@ -188,7 +189,7 @@ class ScaspHarness():
 			else:
 				output = None
 
-		return output
+		return output, full
 
 	def take_action(self, action):
 		"""
