@@ -109,5 +109,6 @@ if __name__ == '__main__':
 	# objects, actions = cfc_helper.huang_wash_dirty_dishes(objects)
 	# objects, actions = cfc_helper.huang_feed_me(objects)
 	# objects, actions = cfc_helper.huang_breakfast(objects)
-	objects, actions = cfc_helper.huang_read(objects)
+	# objects, actions = cfc_helper.huang_read(objects)
+	objects, actions = cfc_helper.just_walk(objects)
 	counterfactual_checker(objects, actions)

@@ -907,3 +907,19 @@ def huang_read(objects):
 	# Step 8: Save your progress or finish the material.
 	actions = [Action(1, "walk", "bedroom74"), Action(2, "walk", "light1"), Action(3, "find", "light1")]
 	return objects, actions
+
+def just_walk(objects):
+	# book192
+	objects.append(VHObject("obj", 1, closed=True, grabbable=True, cuttable=True, can_open=True, readable=True,
+	                        has_paper=True, movable=True, props=True, inside=["kitchen207"]))
+	# Task: Read - 66.67%
+	# Step 1: Choose what to read (e.g., book, article, e-book).
+	# Step 2: Find a comfortable reading environment.
+	# Step 3: Gather necessary tools (e.g., bookmark, device, notebook).
+	# Step 4: Open the material to the correct page or section.
+	# Step 5: Begin reading at your own pace.
+	# Step 6: Take breaks if needed to avoid fatigue.
+	# Step 7: Reflect on or summarize what you’ve read.
+	# Step 8: Save your progress or finish the material.
+	actions = [Action(1, "walk", "obj1")]
+	return objects, actions
