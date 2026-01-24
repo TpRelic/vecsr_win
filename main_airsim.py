@@ -2,9 +2,9 @@ import logging
 import time
 import datetime
 
-import scaspharness
-import simulator_airsim
-from scasp_client import ScaspClient
+from src.scasp_functions import scaspharness
+from src.simulators import simulator_airsim
+from src.scasp_functions.scasp_client import ScaspClient
 from main_helpers import check_results
 
 def state_subset(final_state, curr_state):

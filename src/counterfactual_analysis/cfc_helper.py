@@ -12,6 +12,16 @@ class Action:
 			rule = rule + "action_done(" + self.action + ", " + self.object + ", " + str(self.time) + ").\n"
 		return rule
 
+	def print(self):
+		object = ""
+		if isinstance(self.object, list):
+			for o in self.object:
+				object += o + ", "
+			object = object.rstrip(", ")
+		elif isinstance(self.object, str):
+			object = self.object
+		print(str(self.time) + ") [" + self.action + "] " + object)
+
 class VHObject:
 	def __init__(self, type, number,
 	             grabbable=False, eatable=False, can_open=False, sittable=False,
@@ -97,6 +107,9 @@ class VHObject:
 		else:
 			self.facing = facing
 
+	def set_number(self, num):
+		self.number = num
+		self.name = self.type + str(self.number)
 	def get_scasp(self, actions=None):
 		rules = "type(" + self.name + ", " + self.type + ").\n"
 		if self.grabbable:
@@ -311,6 +324,121 @@ class VHObject:
 			for i in facing:
 				rules = rules + "facing(" + name + ", " + i + ", " + str(time) + ").\n"
 		return rules
+
+	def print(self, properties_only=False):
+		print("Name: " + self.name)
+		properties = ""
+		if self.grabbable:
+			properties += "grabbable, "
+		if self.eatable:
+			properties += "eatable, "
+		if self.can_open:
+			properties += "can_open, "
+		if self.sittable:
+			properties += "sittable, "
+		if self.lieable:
+			properties += "lieable, "
+		if self.movable:
+			properties += "movable, "
+		if self.surfaces:
+			properties += "surfaces, "
+		if self.has_switch:
+			properties += "has_switch, "
+		if self.rooms:
+			properties += "rooms, "
+		if self.floor:
+			properties += "floor, "
+		if self.walls:
+			properties += "walls, "
+		if self.ceiling:
+			properties += "ceiling, "
+		if self.decor:
+			properties += "decor, "
+		if self.cover_object:
+			properties += "cover_object, "
+		if self.lamps:
+			properties += "lamps, "
+		if self.furniture:
+			properties += "furniture, "
+		if self.containers:
+			properties += "containers, "
+		if self.doors:
+			properties += "doors, "
+		if self.props:
+			properties += "props, "
+		if self.pourable:
+			properties += "pourable, "
+		if self.cream:
+			properties += "cream, "
+		if self.recipient:
+			properties += "recipient, "
+		if self.windows:
+			properties += "windows, "
+		if self.has_plug:
+			properties += "has_plug, "
+		if self.electronics:
+			properties += "electronics, "
+		if self.appliances:
+			properties += "appliances, "
+		if self.hangable:
+			properties += "hangable, "
+		if self.clothes:
+			properties += "clothes, "
+		if self.lookable:
+			properties += "lookable, "
+		if self.has_paper:
+			properties += "has_paper, "
+		if self.cuttable:
+			properties += "cuttable, "
+		if self.readable:
+			properties += "readable, "
+		if self.characters:
+			properties += "characters, "
+		if self.food:
+			properties += "food, "
+		if self.drinkable:
+			properties += "drinkable, "
+
+		if not properties_only:
+			if self.closed:
+				properties += "closed, "
+			if self.open:
+				properties += "open, "
+			if self.on:
+				properties += "on, "
+			if self.off:
+				properties += "off, "
+			if self.held:
+				properties += "held, "
+			if self.sat_on:
+				properties += "sat_on, "
+			if self.laid_on:
+				properties += "laid_on, "
+			if self.used:
+				properties += "used, "
+			if self.eaten:
+				properties += "eaten, "
+			if self.sitting:
+				properties += "sitting, "
+			if self.laying:
+				properties += "laying, "
+		properties = properties.rstrip(", ")
+		if properties:
+			print(properties)
+		if properties_only:
+			return
+		if self.inside:
+			print("Inside:")
+			print(self.inside)
+		if self.ontopof:
+			print("On top of:")
+			print(self.ontopof)
+		if self.close:
+			print("Close:")
+			print(self.close)
+		if self.facing:
+			print("Facing:")
+			print(self.facing)
 
 def get_non_sim_object(object):
 	if object == "shoe3203":
@@ -909,17 +1037,7 @@ def huang_read(objects):
 	return objects, actions
 
 def just_walk(objects):
-	# book192
 	objects.append(VHObject("obj", 1, closed=True, grabbable=True, cuttable=True, can_open=True, readable=True,
 	                        has_paper=True, movable=True, props=True, inside=["kitchen207"]))
-	# Task: Read - 66.67%
-	# Step 1: Choose what to read (e.g., book, article, e-book).
-	# Step 2: Find a comfortable reading environment.
-	# Step 3: Gather necessary tools (e.g., bookmark, device, notebook).
-	# Step 4: Open the material to the correct page or section.
-	# Step 5: Begin reading at your own pace.
-	# Step 6: Take breaks if needed to avoid fatigue.
-	# Step 7: Reflect on or summarize what you’ve read.
-	# Step 8: Save your progress or finish the material.
 	actions = [Action(1, "walk", "obj1")]
 	return objects, actions

@@ -14,8 +14,8 @@ high-level tasks.
 ## How To Run with VirtualHome
 In addition to the code in this repository, anyone looking to run the real 
 VirtualHome simulator will need to clone the 
-[VirtualHome repository](https://github.com/xavierpuigf/virtualhome) in the top 
-level directory for this repo. You will also need to download the [VirtualHome
+[VirtualHome repository](https://github.com/xavierpuigf/virtualhome) in the src 
+directory for this repo. You will also need to download the [VirtualHome
 executable](http://virtual-home.org/documentation/master/get_started/get_started.html#installation).
 This program is designed for MacOS, and it is not platform-agnostic. 
 
@@ -24,7 +24,8 @@ how to do so can be found in the
 [s(CASP) README](https://gitlab.software.imdea.org/ciao-lang/sCASP). 
 
 To run the program, the VirtualHome executable will have to be on and allowed
-to access network traffic. After turning it on, the main_virtualhome.py file can be run. The 
+to access network traffic. After turning it on, the main_virtualhome.py file can 
+be run. The 
 first thirty lines of the main method are various parameters concerning levels
 of static analysis, which task to perform, and some quality of life features.
 
@@ -100,7 +101,7 @@ If you use VECSR for work/research presented in a publication
 (whether directly, or as a dependency to another package), we ask that you please 
 use the following citation:
      
-     Alexis R. Tudor, (2025). VECSR: Virtually Embodied Common Sense Reasoning. https://github.com/Alexandara/vecsr/
+     Tudor, A.R., Arias, J., Gupta, G.: VECSR: Virtually Embodied Common Sense Reasoning System. In: Proceedings 41st International Conference on Logic Programming, The University of Calabria, Arcavacata CS, Italy, September 12-19-2025. Electronic Proceedings in Theoretical Computer Science, Open Publishing Association (2025)
      
 **In Projects:**
 

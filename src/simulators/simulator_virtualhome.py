@@ -1,10 +1,10 @@
 import logging
 import re
 import glob
-from utils_demo import *
+from src.utils_demo import *
 from abc import abstractmethod
 
-from simulator import Simulator
+from src.simulators.simulator import Simulator
 
 class VirtualHomeObject:
 	def __init__(self, name, identifier=None):

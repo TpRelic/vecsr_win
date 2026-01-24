@@ -304,15 +304,30 @@ choose_action(Action, State1, _) :- legal_action(Action, State1).
 %new_suggestrx
 
 % Suggested actions in priority order
-suggest(grab(X), [close(Close), holds(Holds), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(X, Close), not_member(X, Holds).
-suggest(put(X,Y), [close(Close), holds(Held), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoN), _, _, _, _, _]) :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(Y, Close), member(X, Held).
-suggest(walk(X), [_, _, _, _, _, on(OnI), _, _, _], [_, _, _, _, _, on(OnF), _, _, _]) :- not_member(X,OnI), member(X, OnF).
-suggest(switchon(X), _, [_, _, _, _, _, on(On), _, _, _]) :- member(X, On).
-suggest(walk(Y), [_, holds(Held), _, _, _, _, _, _, _], [_, _, _, on_top_of(Oto), _, _, _, _, _]) :- member([X,Y], Oto), member(X, Held).
-suggest(put(X, Y), _, [_, _, _, on_top_of(Oto), _, _, _, _, _]) :- member([X,Y], Oto).
-suggest(put(X, Y), [close(CloseI), holds(Held), _, on_top_of(Oto), _, _, _, _, _], [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _]) :-
-    type(Y, floor), member(X, Sat), member(X, Held), member(Z, CloseI), member(Z, CloseF), ontopof_inherited(Y, Z, Oto).
-suggest(walk(X), [_, holds(Held), _, on_top_of(OtoI), _, _, _, _, _], [_, _, _, on_top_of(OtoF), _, _, _, _, _]) :- not_hands_full(Held), member([X, Y], OtoF), not_member([X, Y], OtoI), Held \= [_, _].
+suggest(grab(X), [close(Close), holds(Holds), _, on_top_of(OtoI), _, _, _, _, _],
+                 [_, _, _, on_top_of(OtoN), _, _, _, _, _])
+                        :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(X, Close), not_member(X, Holds).
+suggest(put(X,Y), [close(Close), holds(Held), _, on_top_of(OtoI), _, _, _, _, _],
+                  [_, _, _, on_top_of(OtoN), _, _, _, _, _])
+                        :- member([X, Y], OtoN), not_member([X, Y], OtoI), member(Y, Close), member(X, Held).
+suggest(walk(X), [_, _, _, _, _, on(OnI), _, _, _],
+                 [_, _, _, _, _, on(OnF), _, _, _])
+                        :- not_member(X,OnI), member(X, OnF).
+suggest(switchon(X), _,
+                    [_, _, _, _, _, on(On), _, _, _])
+                        :- member(X, On).
+suggest(walk(Y), [_, holds(Held), _, _, _, _, _, _, _],
+                 [_, _, _, on_top_of(Oto), _, _, _, _, _])
+                        :- member([X,Y], Oto), member(X, Held).
+suggest(put(X, Y), _,
+                  [_, _, _, on_top_of(Oto), _, _, _, _, _])
+                        :- member([X,Y], Oto).
+suggest(put(X, Y), [close(CloseI), holds(Held), _, on_top_of(Oto), _, _, _, _, _],
+                   [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _])
+                        :- type(Y, floor), member(X, Sat), member(X, Held), member(Z, CloseI), member(Z, CloseF),
+                        ontopof_inherited(Y, Z, Oto).
+suggest(walk(X), [_, holds(Held), _, on_top_of(OtoI), _, _, _, _, _],
+                 [_, _, _, on_top_of(OtoF), _, _, _, _, _ ]) :- not_hands_full(Held), member([X, Y], OtoF), not_member([X, Y], OtoI), Held \= [_, _].
 suggest(grab(X), _, [_, holds(Held), _, _, _, _, _, _, _]) :- member(X, Held).
 suggest(lie(X), _, [_, _, _, _, _, _, laid_on(Lie), _, _]) :- member(X, Lie).
 suggest(walk(X), [_, holds(HeldI), _, _, _, _, _, _, _], [close(Close), holds(HeldF), _, _, _, _, _, _, _]) :- not_hands_full(HeldI), member(X, HeldF), not_member(X, Close).

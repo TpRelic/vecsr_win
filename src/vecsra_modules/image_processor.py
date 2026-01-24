@@ -5,7 +5,7 @@ import json
 import sys
 import logging
 
-sys.path.insert(0, './Depth-Anything-V2')
+sys.path.insert(0, '../Depth-Anything-V2')
 from depth_anything_v2.dpt import DepthAnythingV2
 
 

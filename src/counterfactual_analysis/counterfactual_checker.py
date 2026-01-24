@@ -1,9 +1,10 @@
 import logging
 import re
-import cfc_helper
 
-from scaspharness import ScaspHarness
-from simulator_virtualhome import MockVirtualHomeSimulator
+
+from src.counterfactual_analysis import cfc_helper
+from src.scasp_functions.scaspharness import ScaspHarness
+from src.simulators.simulator_virtualhome import MockVirtualHomeSimulator
 
 rooms = ["bathroom11", "bedroom74", "kitchen207", "livingroom336"]
 
@@ -35,14 +36,14 @@ def format_objects_and_actions(actions, relevant, real_simulator):
 				new_actions.append(cfc_helper.Action(time, "put", action.split(",")[-1]))
 			else:
 				if "(" in action:
-					new_actions.append(cfc_helper.Action(time, action.split("(")[0].replace(",",""), action.split("(")[1].replace(",","")))
+					new_actions.append(cfc_helper.Action(time, action.split("(")[0].replace(",", ""), action.split("(")[1].replace(",", "")))
 				else:
-					new_actions.append(cfc_helper.Action(time, action.replace(",","")))
+					new_actions.append(cfc_helper.Action(time, action.replace(",", "")))
 			time = time + 1
 	return objects, new_actions
 
 
-def counterfactual_checker(objects, actions):
+def counterfactual_checker(objects, actions, rule_file="scasp_knowledge_base/counterfactual_analysis.pl"):
 	fake_sim = MockVirtualHomeSimulator()
 	scasp = ScaspHarness(fake_sim)
 
@@ -51,7 +52,7 @@ def counterfactual_checker(objects, actions):
 		rules = rules + action.get_scasp(include_action=False)
 	for object in objects:
 		rules = rules + object.get_scasp(actions)
-	other_rules = open("scasp_knowledge_base/counterfactual_analysis.pl", "r")
+	other_rules = open(rule_file, "r")
 	rules = rules + other_rules.read()
 	other_rules.close()
 	for action in actions:
@@ -62,19 +63,21 @@ def counterfactual_checker(objects, actions):
 		result, _ = scasp.run_generated_scasp()
 		if result == None:
 			result = "Success"
-		logging.info(str(action.time) + " " + str(result))
+		logging.debug(str(action.time) + " " + str(result))
 		if result == False:
 			logging.warning("Failed action, investigating.")
 			investigate_failure(scasp)
-			break
+			return False
 		rules = rules + "\naction_done(" + action.action + "," + action.object + "," + str(action.time - 1) + ")."
+	logging.info("Plan is valid")
+	return True
 
 def investigate_failure(scasp):
-	scasp.scasp_runner = "./scasp_knowledge_base/test_justification.sh"
+	scasp.scasp_runner = "scasp_knowledge_base/test_justification.sh"
 	with open("scasp_knowledge_base/generated_scasp.pl") as f: d = f.read()
 	with open("scasp_knowledge_base/generated_scasp.pl", "w") as f: f.write(d.replace("?-", "?- not"))
 	_, output = scasp.run_generated_scasp()
-	print(output)
+	logging.error(output)
 
 if __name__ == '__main__':
 	objects = []

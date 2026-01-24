@@ -2,10 +2,10 @@ import logging
 import time
 import datetime
 
-import scaspharness
-import simulator_virtualhome
-from main_helpers import run, check_results, task_helper
-import counterfactual_checker
+from src.scasp_functions import scaspharness
+from src.simulators import simulator_virtualhome
+from src.main_helpers import run, check_results, task_helper
+from src.counterfactual_analysis import counterfactual_checker
 
 def state_subset(final_state, curr_state):
     """
@@ -101,7 +101,7 @@ def run_cfa(actions, relevant, simulator):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome.pl"
+    initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome_v2.pl"
     values = [True,     # 0 Real simulator or not?
               True,    # 1 Optimize or not?
               True,    # 2 Remove unnecessary items or not?
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     few_rooms = values[6]
     cfa = values[7]
     task_selection = 15
-    task = "prepare_letter_for_mailing"
+    task = "read"
     [final_state, answer_key, rooms] = task_helper(task)
     start_time = time.time()
     logging.info("Start Time: %s", datetime.datetime.now())

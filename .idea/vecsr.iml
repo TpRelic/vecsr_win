@@ -4,6 +4,20 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_turk_july" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_turk_robot" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_turk_third" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_upwork_july" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_upwork_kellensecond" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/initstate/results_text_rebuttal_specialparsed_programs_upworknturk_second" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/withoutconds/results_intentions_march-13-18" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/withoutconds/results_text_rebuttal_specialparsed_programs_turk_july" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/withoutconds/results_text_rebuttal_specialparsed_programs_turk_robot" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/withoutconds/results_text_rebuttal_specialparsed_programs_upwork_kellensecond" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/test_cond" />
+      <excludeFolder url="file://$MODULE_DIR$/src/programs_processed_precond_nograb_morepreconds/test_task" />
+      <excludeFolder url="file://$MODULE_DIR$/src/macos_exec.2.2.4.app" />
+      <excludeFolder url="file://$MODULE_DIR$/Output" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

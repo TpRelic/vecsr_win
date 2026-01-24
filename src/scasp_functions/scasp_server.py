@@ -1,4 +1,3 @@
-import logging
 import socket
 from time import sleep
 

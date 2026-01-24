@@ -191,7 +191,8 @@ cython_debug/
 
 # VirtualHome Simulation
 /virtualhome/
-/src/Output/
+/src/virtualhome/
+/Output/
 /src/macos_exec.2.2.4.app/
 /Output/
 /macos_exec.2.2.4.app/
@@ -206,6 +207,9 @@ cython_debug/
 /src/Depth-Anything-V2/checkpoints/depth_anything_v2_vitl.pth
 
 # Other files
-/src/scasp_knowledge_base/tests
-/src/scasp_knowledge_base/generated_scasp.pl
-/src/scasp_knowledge_base/past_states.pl
+/scasp_knowledge_base/tests
+/scasp_knowledge_base/generated_scasp.pl
+/scasp_knowledge_base/past_states.pl
+
+# VirtualHome dataset
+/src/programs_processed_precond_nograb_morepreconds/

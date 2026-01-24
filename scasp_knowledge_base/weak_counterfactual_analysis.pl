@@ -1,38 +1,12 @@
-time(1).
-type(bathroom11, bathroom).
-rooms(bathroom11).
-type(bedroom74, bedroom).
-rooms(bedroom74).
-type(kitchen207, kitchen).
-rooms(kitchen207).
-type(livingroom336, livingroom).
-rooms(livingroom336).
-type(character1, character).
-characters(character1).
-inside(character1, kitchen207, 0).
-inside(character1, kitchen207, 1).
-close(character1, obj1, 1).
-type(obj1, obj).
-grabbable(obj1).
-can_open(obj1).
-movable(obj1).
-props(obj1).
-has_paper(obj1).
-cuttable(obj1).
-readable(obj1).
-closed(obj1, 0).
-inside(obj1, kitchen207, 0).
-closed(obj1, 1).
-inside(obj1, kitchen207, 1).
 % General Rules
 time(0).
 :- held(X, T), held(Y, T), held(Z, T), X \= Y, X \= Z, Y \= Z.
 -rooms(X) :- not rooms(X).
-open(X, T) :- not closed(X, T).
-closed(X, T) :- not open(X, T).
+#abducible open.
+#abducible closed.
+#abducible off.
+#abducible on.
 open(X, _) :- rooms(X).
-off(X, T) :- not on(X, T).
-on(X, T) :- not off(X, T).
 
 reachable(X, T) :- not -reachable(X, T).
 -reachable(X, T) :- inside(X, Obj1, T), closed(Obj1, T).
@@ -124,6 +98,3 @@ action(turn_to).
 action(point).
 
 #show action_done/3, not action_valid/3.
-
-
-?- action_possible(walk,obj1,0).

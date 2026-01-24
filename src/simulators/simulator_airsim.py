@@ -4,7 +4,7 @@ import cv2
 import os
 import logging
 
-from simulator import Simulator
+from src.simulators.simulator import Simulator
 from image_processor import detected_front_collision
 
 class AirSimSimulator(Simulator):
