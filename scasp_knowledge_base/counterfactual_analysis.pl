@@ -43,7 +43,7 @@ action_possible(Action, Item, T) :-
 %    action_done(B, Item2, T).
 
 action_valid(walk,X,T) :- X \= character1, rooms(X), not inside(character1, X, T), not action_invalid(walk, X, T).
-action_valid(walk,X,T) :- X \= character1, -rooms(X), not sitting(character1, T), not held(X, T), reachable(X, T),
+action_valid(walk,X,T) :- -rooms(X), not sitting(character1, T), not held(X, T), reachable(X, T),
                         not close(character1, X, T),
                         inside(character1, Room, T), inside(X, Room, T),
                         not action_invalid(walk, X, T).

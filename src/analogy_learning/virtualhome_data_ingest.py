@@ -71,7 +71,8 @@ def pickle_virtualhome_data():
 					else:
 						a = action[0]
 						action.pop(0)
-						actions.append(Action(time, a, objects=action))
+						cleaned_actions = [s.replace("_", "") for s in action]
+						actions.append(Action(time, a, objects=cleaned_actions))
 					time = time + 1
 				tasks[Path(path).stem] = VH_Task(task, desc, actions)
 	for path in Path(preconditions_folder).rglob("*"):
@@ -81,8 +82,10 @@ def pickle_virtualhome_data():
 				# TODO: read preconditions
 	pickle.dump(tasks, open("src/analogy_learning/vh_tasks_db.pkl", 'wb'))
 
-def unpickle_virtualhome_data():
-	loaded = pickle.load(open("src/analogy_learning/vh_tasks_db.pkl", 'rb'))
+def unpickle_virtualhome_data(use_llm_data=True):
+	loaded = {}
+	if Path("src/analogy_learning/vh_tasks_db.pkl").is_file():
+		loaded = pickle.load(open("src/analogy_learning/vh_tasks_db.pkl", 'rb'))
 	return loaded
 
 def print_virtualhome_data(data):
@@ -174,10 +177,13 @@ def pickle_virtualhome_objects():
 			objects[node["class_name"]].drinkable = True
 	pickle.dump(objects, open("src/analogy_learning/vh_objects_db.pkl", 'wb'))
 
-
 def unpickle_virtualhome_objects():
-	loaded = pickle.load(open("src/analogy_learning/vh_objects_db.pkl", 'rb'))
-	return loaded
+	data = {}
+	if Path("src/analogy_learning/vh_objects_db.pkl").is_file():
+		data = pickle.load(open("src/analogy_learning/vh_objects_db.pkl", 'rb'))
+	if Path("src/analogy_learning/llm_objects_db.pkl").is_file():
+		data = pickle.load(open("src/analogy_learning/llm_objects_db.pkl", 'rb')) | data
+	return data
 
 def print_virtualhome_objects(objects):
 	for key in objects:

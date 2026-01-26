@@ -1,11 +1,13 @@
 import logging
 import socket
 import subprocess
+from copy import deepcopy
 from time import sleep
 
 
 class ScaspHarness():
-	def __init__(self, simulator, initial_rules=None, optimize_rules=False, rooms=None, scasp_client=None, by_item=False):
+	def __init__(self, simulator, initial_rules=None, optimize_rules=False, rooms=None,
+	             scasp_client=None, by_item=False, multiple_worlds=False):
 		if simulator:
 			self.simulator = simulator
 			if simulator.which_simulator() == "VirtualHome":
@@ -26,7 +28,11 @@ class ScaspHarness():
 		self.relevant_items = None
 		self.scasp_client = scasp_client
 		self.by_item = by_item
-		self.scasp_runner = "./scasp_knowledge_base/test.sh"
+		if multiple_worlds:
+			self.scasp_runner = "./scasp_knowledge_base/scasp_all_answers.sh"
+		else:
+			self.scasp_runner = "./scasp_knowledge_base/scasp_runner.sh"
+		self.generated_scasp = "scasp_knowledge_base/generated_scasp.pl"
 
 	def get_scasp(self):
 		"""
@@ -49,7 +55,7 @@ class ScaspHarness():
 		if file:
 			filename = file
 		else:
-			filename = "scasp_knowledge_base/generated_scasp.pl"
+			filename = deepcopy(self.generated_scasp)
 		new_file_info = ""
 		# For running simulations, we want to keep previous state information
 		if self.simulator.timestamp > 1:
@@ -114,7 +120,7 @@ class ScaspHarness():
 		str_query = self.build_rule(query[0], low=False) + "."
 		logging.info("Running query: " + query[0][0])
 		logging.debug("Full query: " + str_query)
-		f = open("scasp_knowledge_base/generated_scasp.pl", "a")
+		f = open(self.generated_scasp, "a")
 		f.write("\n\n?- ")
 		f.write(str_query)
 		f.close()
@@ -157,39 +163,43 @@ class ScaspHarness():
 		:return: results of running the file
 		"""
 		output = [{}]
+		# Begin actual processing
 		if scasp_client:
 			with open('scasp_knowledge_base/generated_scasp.pl', 'r') as content_file:
 				message = content_file.read()
 			data = scasp_client.send_text(message)
 			if data[0] == "f":
-				return False
-			data = data.split(".")
-			data.pop(0)
-			for i, item in enumerate(data):
+				return False, data
+			data_processed = data.split(".")
+			data_processed.pop(0)
+			for i, item in enumerate(data_processed):
 				if i % 2 == 0:
-					output[0][item] = data[i + 1]
+					output[0][item] = data_processed[i + 1]
+			if output:
+				return output, data
+			else:
+				return True, data
 		else:
 			output = subprocess.run([self.scasp_runner], shell=True, capture_output=True, text=True)
-			output = output.stdout
-			full = output
-			if 'BINDINGS' in output and "BINDINGS: ?" not in output:
+			out = output.stdout
+			err = output.stderr
+			if 'BINDINGS' in out and "BINDINGS: ?" not in out:
 				options = []
-				output = output.split('ANSWER:')[1:]
-				for option in output:
+				answer = out.split('ANSWER:')[1:]
+				for option in answer:
 					option = option.replace(" ?", "")
 					opt = option[option.find('BINDINGS') + 10:-2].strip()
 					opt = opt.split('\n')
 					opt = [item.split(' = ') for item in opt]
 					opt = {name: value.strip() for [name, value] in opt}
 					options.append(opt)
-				output = options
+				return options, out
 			# If no model found, return an empty dictionary.
-			elif 'no models' in output:
-				output = False
+			elif 'no models' in out:
+				return False, out
 			else:
-				output = None
-
-		return output, full
+				return None, err
+		return None, None
 
 	def take_action(self, action):
 		"""

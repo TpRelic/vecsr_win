@@ -4,7 +4,7 @@ import re
 
 from src.counterfactual_analysis import cfc_helper
 from src.scasp_functions.scaspharness import ScaspHarness
-from src.simulators.simulator_virtualhome import MockVirtualHomeSimulator
+from src.simulators.simulator import MockSimulator
 
 rooms = ["bathroom11", "bedroom74", "kitchen207", "livingroom336"]
 
@@ -44,7 +44,7 @@ def format_objects_and_actions(actions, relevant, real_simulator):
 
 
 def counterfactual_checker(objects, actions, rule_file="scasp_knowledge_base/counterfactual_analysis.pl"):
-	fake_sim = MockVirtualHomeSimulator()
+	fake_sim = MockSimulator()
 	scasp = ScaspHarness(fake_sim)
 
 	rules = ""
@@ -60,12 +60,13 @@ def counterfactual_checker(objects, actions, rule_file="scasp_knowledge_base/cou
 		f.write(rules)
 		f.write("\n\n?- action_possible(" + action.action + "," + action.object + "," + str(action.time - 1) + ").")
 		f.close()
-		result, _ = scasp.run_generated_scasp()
-		if result == None:
+		result, output = scasp.run_generated_scasp()
+		if result:
 			result = "Success"
 		logging.debug(str(action.time) + " " + str(result))
-		if result == False:
-			logging.warning("Failed action, investigating.")
+		if not result:
+			logging.warning("Failed action, investigating")
+			logging.warning(action.print(return_print=True))
 			investigate_failure(scasp)
 			return False
 		rules = rules + "\naction_done(" + action.action + "," + action.object + "," + str(action.time - 1) + ")."
@@ -80,6 +81,7 @@ def investigate_failure(scasp):
 	logging.error(output)
 
 if __name__ == '__main__':
+	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 	objects = []
 	# rooms
 	for room in rooms:
@@ -89,7 +91,7 @@ if __name__ == '__main__':
 	# character1
 	objects.append(cfc_helper.VHObject("character", 1, characters=True, inside=["kitchen207"]))
 	# Some possible setups (others stored elsewhere for size convenience)
-	# objects, actions = cfc_helper.vecsr_put_shoes_and_coat(objects)
+	objects, actions = cfc_helper.vecsr_put_shoes_and_coat(objects)
 	# objects, actions = cfc_helper.huang_change_sheets_and_pillowcases(objects)
 	# objects, actions = cfc_helper.vecsr_have_iced_coffee(objects)
 	# objects, actions, = cfc_helper.vecsr_get_in_way_of_guests_trying_to_leave(objects)
@@ -113,5 +115,5 @@ if __name__ == '__main__':
 	# objects, actions = cfc_helper.huang_feed_me(objects)
 	# objects, actions = cfc_helper.huang_breakfast(objects)
 	# objects, actions = cfc_helper.huang_read(objects)
-	objects, actions = cfc_helper.just_walk(objects)
+	# objects, actions = cfc_helper.just_walk(objects)
 	counterfactual_checker(objects, actions)

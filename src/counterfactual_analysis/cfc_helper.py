@@ -12,7 +12,7 @@ class Action:
 			rule = rule + "action_done(" + self.action + ", " + self.object + ", " + str(self.time) + ").\n"
 		return rule
 
-	def print(self):
+	def print(self, return_print=False):
 		object = ""
 		if isinstance(self.object, list):
 			for o in self.object:
@@ -20,6 +20,8 @@ class Action:
 			object = object.rstrip(", ")
 		elif isinstance(self.object, str):
 			object = self.object
+		if return_print:
+			return str(self.time) + ") [" + self.action + "] " + object
 		print(str(self.time) + ") [" + self.action + "] " + object)
 
 class VHObject:
@@ -37,6 +39,8 @@ class VHObject:
 	             sat_on=False, laid_on = False, used=False, eaten=False,
 	             sitting=False, laying=False,
 	             inside=None, ontopof=None, close=None, facing=None):
+		if type == "table":
+			type = "tabl"
 		self.name = type + str(number)
 		self.type = type
 		self.number = number
@@ -439,6 +443,576 @@ class VHObject:
 		if self.facing:
 			print("Facing:")
 			print(self.facing)
+
+	def compare_properties(self, second_object):
+		one_hot = []
+		total_positive = 0
+		total_negative = 0
+		true_positive = 0
+		false_positive = 0
+		true_negative = 0
+		false_negative = 0
+		if self.grabbable == second_object.grabbable:
+			one_hot.append(1)
+			if self.grabbable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.grabbable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.eatable == second_object.eatable:
+			one_hot.append(1)
+			if self.eatable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.eatable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.can_open == second_object.can_open:
+			one_hot.append(1)
+			if self.can_open:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.can_open:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.sittable == second_object.sittable:
+			one_hot.append(1)
+			if self.sittable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.sittable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.lieable == second_object.lieable:
+			one_hot.append(1)
+			if self.lieable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.lieable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.movable == second_object.movable:
+			one_hot.append(1)
+			if self.movable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.movable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.surfaces == second_object.surfaces:
+			one_hot.append(1)
+			if self.surfaces:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.surfaces:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.has_switch == second_object.has_switch:
+			one_hot.append(1)
+			if self.has_switch:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.has_switch:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.rooms == second_object.rooms:
+			one_hot.append(1)
+			if self.rooms:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.rooms:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.floor == second_object.floor:
+			one_hot.append(1)
+			if self.floor:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.floor:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.walls == second_object.walls:
+			one_hot.append(1)
+			if self.walls:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.walls:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.ceiling == second_object.ceiling:
+			one_hot.append(1)
+			if self.ceiling:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.ceiling:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.decor == second_object.decor:
+			one_hot.append(1)
+			if self.decor:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.decor:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.cover_object == second_object.cover_object:
+			one_hot.append(1)
+			if self.cover_object:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.cover_object:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.lamps == second_object.lamps:
+			one_hot.append(1)
+			if self.lamps:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.lamps:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.furniture == second_object.furniture:
+			one_hot.append(1)
+			if self.furniture:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.furniture:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.containers == second_object.containers:
+			one_hot.append(1)
+			if self.containers:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.containers:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.doors == second_object.doors:
+			one_hot.append(1)
+			if self.doors:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.doors:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.props == second_object.props:
+			one_hot.append(1)
+			if self.props:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.props:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.pourable == second_object.pourable:
+			one_hot.append(1)
+			if self.pourable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.pourable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.cream == second_object.cream:
+			one_hot.append(1)
+			if self.cream:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.cream:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.recipient == second_object.recipient:
+			one_hot.append(1)
+			if self.recipient:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.recipient:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.windows == second_object.windows:
+			one_hot.append(1)
+			if self.windows:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.windows:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.has_plug == second_object.has_plug:
+			one_hot.append(1)
+			if self.has_plug:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.has_plug:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.electronics == second_object.electronics:
+			one_hot.append(1)
+			if self.electronics:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.electronics:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.appliances == second_object.appliances:
+			one_hot.append(1)
+			if self.appliances:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.appliances:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.hangable == second_object.hangable:
+			one_hot.append(1)
+			if self.hangable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.hangable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.clothes == second_object.clothes:
+			one_hot.append(1)
+			if self.clothes:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.clothes:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.lookable == second_object.lookable:
+			one_hot.append(1)
+			if self.lookable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.lookable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.has_paper == second_object.has_paper:
+			one_hot.append(1)
+			if self.has_paper:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.has_paper:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.cuttable == second_object.cuttable:
+			one_hot.append(1)
+			if self.cuttable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.cuttable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.readable == second_object.readable:
+			one_hot.append(1)
+			if self.readable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.readable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.characters == second_object.characters:
+			one_hot.append(1)
+			if self.characters:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.characters:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.food == second_object.food:
+			one_hot.append(1)
+			if self.food:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.food:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		if self.drinkable == second_object.drinkable:
+			one_hot.append(1)
+			if self.drinkable:
+				total_positive += 1
+				true_positive += 1
+			else:
+				total_negative += 1
+				true_negative += 1
+		else:
+			one_hot.append(0)
+			if self.drinkable:
+				total_positive += 1
+				false_negative += 1
+			else:
+				total_negative += 1
+				false_positive += 1
+		return one_hot, total_positive, total_negative, true_positive, true_negative, false_positive, false_negative
 
 def get_non_sim_object(object):
 	if object == "shoe3203":

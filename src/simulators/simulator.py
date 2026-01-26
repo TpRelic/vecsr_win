@@ -1,4 +1,4 @@
-
+import logging
 from abc import ABC, abstractmethod
 
 class Simulator(ABC):
@@ -16,3 +16,11 @@ class Simulator(ABC):
 	@staticmethod
 	def which_simulator():
 		return "Null"
+
+class MockSimulator(Simulator):
+	def get_state(self):
+		logging.debug("Mock get_state")
+
+	def take_action(self, action):
+		logging.debug("Mock take_action: " + str(action))
+

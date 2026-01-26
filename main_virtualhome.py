@@ -103,22 +103,22 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
     initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome_v2.pl"
     values = [True,     # 0 Real simulator or not?
-              True,    # 1 Optimize or not?
-              True,    # 2 Remove unnecessary items or not?
+              False,    # 1 Optimize or not?
+              False,    # 2 Remove unnecessary items or not?
               False,    # 3 Run dynamically or not?
               False,    # 4 Use an answer key or not?
               False,    # 5 Get plans step by step or not?
-              True,    # 6 Only use relevant rooms or not?
-              True  # 7 Counterfactual analysis?
+              False,    # 6 Only use relevant rooms or not?
+              False  # 7 Counterfactual analysis?
               ]
-    best = True
+    best = False
     best_norelitems = False
     best_noopt = False
     best_norelrooms = False
     only_relitems = False
     only_opt = False
     only_relrooms = False
-    nothing = False
+    nothing = True
     if best:
         values[1] = True
         values[2] = True
@@ -162,6 +162,8 @@ if __name__ == '__main__':
     task_selection = 15
     task = "read"
     [final_state, answer_key, rooms] = task_helper(task)
+    if not few_rooms:
+        rooms = None
     start_time = time.time()
     logging.info("Start Time: %s", datetime.datetime.now())
     # Create simulator
@@ -177,7 +179,8 @@ if __name__ == '__main__':
     start_time = time.time()
     if reduce_items or cfa:
         relevant = get_relevant(task)
-        program.relevant_items = relevant
+        if reduce_items:
+            program.relevant_items = relevant
     # Full loop
     if step_by_step:
         run_step_by_step(task, final_state, program, state_subset)
