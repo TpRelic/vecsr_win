@@ -103,15 +103,16 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
     initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome_v2.pl"
     values = [True,     # 0 Real simulator or not?
-              False,    # 1 Optimize or not?
-              False,    # 2 Remove unnecessary items or not?
+              True,     # 1 Optimize by dependency graph or not?
+              True,     # 2 Partially ground to remove unnecessary items or not?
               False,    # 3 Run dynamically or not?
               False,    # 4 Use an answer key or not?
               False,    # 5 Get plans step by step or not?
-              False,    # 6 Only use relevant rooms or not?
-              False  # 7 Counterfactual analysis?
+              True,     # 6 Only use relevant modules/rooms or not?
+              False,    # 7 Counterfactual analysis?
+              "read"    # 8 Task to complete
               ]
-    best = True
+    best = False
     best_norelitems = False
     best_noopt = False
     best_norelrooms = False
@@ -159,8 +160,7 @@ if __name__ == '__main__':
     step_by_step = values[5]
     few_rooms = values[6]
     cfa = values[7]
-    task_selection = 15
-    task = "read"
+    task = values[8]
     [final_state, answer_key, rooms] = task_helper(task)
     if not few_rooms:
         rooms = None

@@ -7,8 +7,8 @@ type(sofa369, sofa).
 sittable(sofa369).
 lieable(sofa369).
 on_list([lightswitch175]).
-inside([[book192, bedroom74], [sofa369, livingroom336], [lightswitch175, bedroom74], [book192, bookshelf107]]).
-ontopof([[pillow423, sofa369], [tv427, sofa369], [sofa369, rug418], [pillow422, sofa369], [book192, bookshelf107]]).
+inside([[book192, bedroom74], [book192, bookshelf107], [sofa369, livingroom336], [lightswitch175, bedroom74]]).
+ontopof([[book192, bookshelf107], [pillow423, sofa369], [pillow422, sofa369], [sofa369, rug418], [tv427, sofa369]]).
 rooms(bedroom74).
 rooms(livingroom336).
 type(vacuum0, vacuum).
