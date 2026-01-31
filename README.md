@@ -2,7 +2,7 @@
 VECSR is a system which translates a VirtualHome simulation 
 environment into s(CASP) facts which can then be reasoned over to produce 
 actions. These actions are fulfilled in the simulation environment to complete
-high-level tasks. 
+high-level tasks.
 
 ## Technology Used
 [s(CASP)](https://gitlab.software.imdea.org/ciao-lang/sCASP)
@@ -14,20 +14,38 @@ high-level tasks.
 ## How To Run with VirtualHome
 In addition to the code in this repository, anyone looking to run the real 
 VirtualHome simulator will need to clone the 
-[VirtualHome repository](https://github.com/xavierpuigf/virtualhome) in the src 
-directory for this repo. You will also need to download the [VirtualHome
+[VirtualHome repository](https://github.com/xavierpuigf/virtualhome) in the top 
+level directory for this repo. You will also need to download the [VirtualHome
 executable](http://virtual-home.org/documentation/master/get_started/get_started.html#installation).
-This program is designed for MacOS, and it is not platform-agnostic. 
 
 Additionally, s(CASP) will need to be installed on the machine. Instructions on
 how to do so can be found in the 
 [s(CASP) README](https://gitlab.software.imdea.org/ciao-lang/sCASP). 
 
 To run the program, the VirtualHome executable will have to be on and allowed
-to access network traffic. After turning it on, the main_virtualhome.py file can 
-be run. The 
+to access network traffic. After turning it on, the main_virtualhome.py file can be run. The 
 first thirty lines of the main method are various parameters concerning levels
 of static analysis, which task to perform, and some quality of life features.
+
+### Installation for Windows (WSL)
+VECSR was originally designed for MacOS, so you need to go through some extra setup on WSL to get it working.
+1. Install WSL
+    - `wsl --install` `wsl --update`
+    - `sudo apt update` `sudo apt install build-essential`
+    - `sudo apt install python3 python3-venv python3-full`
+3. In "Turn Windows Features On or Off" > Enable Virtual Machine Platform and Windows Subsystem for Linux
+4. In "WSL Settings" > Networking > Networking Mode > Mirrored
+a. Restart if needed.
+5. Using WSL, Install s(CASP):
+    - `curl https://ciao-lang.org/boot -sSfL | sh`
+    -  `ciao get gitlab.software.imdea.org/ciao-lang/sCASP`
+    -  `scasp --update`
+6. Clone the VECSR Repository
+7. In VECSR the folder > Clone the Virtualhome Repository (API)
+8. Make a Python VENV and install all pip / libs (both VECSR and VirtualHome)
+9. On the Windows side, download VirtualHome's Windows Exe to somewhere like Program Files, and run it.
+    - You can verify if it's open in WSL w/ `ip route | grep default` for `8080`
+10. Run main_virtualhome.py
 
 ## Examples
 The examples referenced in the ICLP 2025 conference paper (citation incoming)
@@ -101,7 +119,7 @@ If you use VECSR for work/research presented in a publication
 (whether directly, or as a dependency to another package), we ask that you please 
 use the following citation:
      
-     Tudor, A.R., Arias, J., Gupta, G.: VECSR: Virtually Embodied Common Sense Reasoning System. In: Proceedings 41st International Conference on Logic Programming, The University of Calabria, Arcavacata CS, Italy, September 12-19-2025. Electronic Proceedings in Theoretical Computer Science, Open Publishing Association (2025)
+     Alexis R. Tudor, (2025). VECSR: Virtually Embodied Common Sense Reasoning. https://github.com/Alexandara/vecsr/
      
 **In Projects:**
 
@@ -111,6 +129,4 @@ a useful way to acknowledge your use is in your README.
 # License 
 GNU @ Alexis R. Tudor
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
-
-
 
