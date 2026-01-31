@@ -111,14 +111,14 @@ if __name__ == '__main__':
               False,    # 6 Only use relevant rooms or not?
               False  # 7 Counterfactual analysis?
               ]
-    best = False
+    best = True
     best_norelitems = False
     best_noopt = False
     best_norelrooms = False
     only_relitems = False
     only_opt = False
     only_relrooms = False
-    nothing = True
+    nothing = False
     if best:
         values[1] = True
         values[2] = True

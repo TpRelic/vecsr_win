@@ -1,6 +1,11 @@
 import logging
 import random
 import re
+import itertools
+
+from varname import nameof
+from src.simulators import simulator
+from src.scasp_functions import scaspharness
 
 from src.analogy_learning import virtualhome_data_ingest, nlp, llm
 from src.counterfactual_analysis import cfc_helper, counterfactual_checker
@@ -140,7 +145,7 @@ def test_llm_accuracy(objects_db, llm):
     print("Average Recall: " + str(total_recall/total_number))
     print("Average Accuracy: " + str(total_accuracy/total_number))
 
-def append_files(file1_path, file2_path, output_path):
+def append_files(file1_path, file2_path, output_path, query):
     with open(file1_path, "r", encoding="utf-8") as f1:
         content1 = f1.read()
     with open(file2_path, "r", encoding="utf-8") as f2:
@@ -148,25 +153,62 @@ def append_files(file1_path, file2_path, output_path):
     with open(output_path, "w", encoding="utf-8") as out:
         out.write(content1)
         out.write(content2)
+        out.write("\n\n" + query)
 
-if __name__ == '__main__':
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+def generate_abducible_permutations(query: str, n: int):
+    # Extract predicates like grabbable(X)
+    predicates = re.findall(r"\b\w+\(X\)", query)
+
+    if n > len(predicates):
+        return False
+
+    # n = 0 → return original query unchanged
+    if n == 0:
+        return [query]
+
+    results = []
+
+    # Generate all combinations of size n
+    for combo in itertools.combinations(predicates, n):
+        lines = [f"#abducible {pred}." for pred in combo]
+        results.append("\n".join(lines))
+
+    return results
+
+def generate_queries_from_object(object, degrees_of_difference):
+    rules = "?- "
+    rules = rules + object.get_scasp(properties_only=True)
+    rules = rules.replace(".\n", ", ").replace(object.name, "X").rstrip(", ")
+    rules = rules + "."
+    result = generate_abducible_permutations(rules, degrees_of_difference)
+    if result:
+        result = [s + rules for s in result]
+        return result
+    else:
+        return result
+
+# WIP
+def full_analogy():
     logging.info("Initializing databases...")
-    # Ingest all VH Dataset Plans and VH Objects
+    # Initialize s(CASP) Harness and LLM
     llm = llm.LocalLLM()
+    sim = simulator.MockSimulator()
+    scasp = scaspharness.ScaspHarness(sim, multiple_worlds=True)
+    # Ingest all VH Dataset Plans and VH Objects
     # virtualhome_data_ingest.pickle_virtualhome_objects()
     # virtualhome_data_ingest.pickle_virtualhome_data()
     objects_db = virtualhome_data_ingest.unpickle_virtualhome_objects()
-    test_llm_accuracy(objects_db, llm)
-    exit(0)
+    # test_llm_accuracy(objects_db, llm)
     tasks_db = virtualhome_data_ingest.unpickle_virtualhome_data()
+    llm_objects_db = {}
     # Split Training and Test Data
     logging.info("Splitting test and training data...")
     train, test = train_test_split_dict(tasks_db, train_ratio=.999, seed=15)
     # For each item in the test dataset...
     for task in test:
         sim_key, similar = nlp.get_similar(test[task].task, train)
-        logging.info("Learning task \"" + test[task].task.replace("\n","") + "\" from \"" + similar.replace("\n","") + "\"")
+        logging.info(
+            "Learning task \"" + test[task].task.replace("\n", "") + "\" from \"" + similar.replace("\n", "") + "\"")
         # OPTIONAL: Verify validity of example task
         # example_valid = counterfactual_verification(train[sim_key], objects_db)
         # logging.info("Example validity: " + str(example_valid))
@@ -182,11 +224,33 @@ if __name__ == '__main__':
             if not name_only in objects_db:
                 logging.warning("Object not in DB: " + name_only)
                 logging.warning("Asking LLM for information...")
-                get_attributes_from_llm(name_only, llm, number=int(number_only))
-                continue
-        # Find similar objects
-        append_files("scasp_knowledge_base/observed_objects_db.pl",
-                     "scasp_knowledge_base/llm_objects_db.pl",
-                     "scasp_knowledge_base/generated_scasp.pl")
+                llm_objects_db[name_only] = get_attributes_from_llm(name_only, llm, number=int(number_only))
+                object_reference = llm_objects_db[name_only]
+            else:
+                object_reference = objects_db[name_only]
+            # Find similar objects
+            similar = []
+            degrees_of_difference = 0
+            while not similar:
+                logging.info("For object " + name_only + " searching for similar objects at " + str(
+                    degrees_of_difference) + " degree of difference.")
+                queries = generate_queries_from_object(object_reference, degrees_of_difference)
+                for query in queries:
+                    append_files("scasp_knowledge_base/observed_objects_db.pl",
+                                 "scasp_knowledge_base/llm_objects_db.pl",
+                                 "scasp_knowledge_base/generated_scasp.pl",
+                                 query)
+                    answer, output = scasp.run_generated_scasp()
+                    if answer:
+                        similar = similar + answer
+                        print(similar)
+                        print(answer)
+                degrees_of_difference += 1
         # Use NLP (spacy?) to identify most relevant objects
         # Verify validity of generated task
+
+
+if __name__ == '__main__':
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    full_analogy()

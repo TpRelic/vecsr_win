@@ -114,8 +114,10 @@ class VHObject:
 	def set_number(self, num):
 		self.number = num
 		self.name = self.type + str(self.number)
-	def get_scasp(self, actions=None):
-		rules = "type(" + self.name + ", " + self.type + ").\n"
+	def get_scasp(self, actions=None, properties_only=False):
+		rules = ""
+		if not properties_only:
+			rules = "type(" + self.name + ", " + self.type + ").\n"
 		if self.grabbable:
 			rules = rules + "grabbable(" + self.name + ").\n"
 		if self.eatable:
@@ -186,6 +188,8 @@ class VHObject:
 			rules = rules + "food(" + self.name + ").\n"
 		if self.drinkable:
 			rules = rules + "drinkable(" + self.name + ").\n"
+		if properties_only:
+			return rules
 		rules = rules + self.time_scasp_helper(self.name, 0, closed = self.closed, open = self.open, on = self.on, off = self.off,
 	                      held = self.held, sat_on = self.sat_on, laid_on = self.laid_on, used = self.used, eaten = self.eaten,
 	                      sitting = self.sitting, laying = self.laying,
