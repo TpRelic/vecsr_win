@@ -33,8 +33,7 @@ VECSR was originally designed for MacOS, so you need to go through some extra se
     - `sudo apt update` `sudo apt install build-essential`
     - `sudo apt install python3 python3-venv python3-full`
 3. In "Turn Windows Features On or Off" > Enable Virtual Machine Platform and Windows Subsystem for Linux
-4. In "WSL Settings" > Networking > Networking Mode > Mirrored
-a. Restart if needed.
+4. In "WSL Settings" > Networking > Networking Mode > Mirrored, Restart if needed.
 5. Using WSL, Install s(CASP):
     - `curl https://ciao-lang.org/boot -sSfL | sh`
     -  `ciao get gitlab.software.imdea.org/ciao-lang/sCASP`
@@ -45,6 +44,7 @@ a. Restart if needed.
 9. On the Windows side, download VirtualHome's Windows Exe to somewhere like Program Files, and run it.
     - You can verify if it's open in WSL w/ `ip route | grep default` for `8080`
 10. Run main_virtualhome.py
+11. NOTE: If sCASP fails to start, it could be a perm / line end error. Try running `script_fix.py` or do it manually.
 
 ### Configuring VECSR for VirtualHome
 

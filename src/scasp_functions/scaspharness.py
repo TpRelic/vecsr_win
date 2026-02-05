@@ -1,6 +1,7 @@
 import logging
 import socket
 import subprocess
+import os
 from copy import deepcopy
 from time import sleep
 
@@ -180,9 +181,19 @@ class ScaspHarness():
 			else:
 				return True, data
 		else:
+			# DEBUG: Print the command being run
+			logging.debug(f"Running command: {self.scasp_runner}")
+			logging.debug(f"Current working directory: {os.getcwd()}")
+			
 			output = subprocess.run([self.scasp_runner], shell=True, capture_output=True, text=True)
 			out = output.stdout
 			err = output.stderr
+			
+			# DEBUG: Print the output
+			logging.debug(f"SCASP stdout: {out}")
+			logging.debug(f"SCASP stderr: {err}")
+			logging.debug(f"SCASP return code: {output.returncode}")
+			
 			if 'BINDINGS' in out and "BINDINGS: ?" not in out:
 				options = []
 				answer = out.split('ANSWER:')[1:]
@@ -198,6 +209,7 @@ class ScaspHarness():
 			elif 'no models' in out:
 				return False, out
 			else:
+				logging.error(f"SCASP failed or produced unexpected output. stderr: {err}")
 				return None, err
 		return None, None
 
