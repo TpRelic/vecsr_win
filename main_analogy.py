@@ -7,7 +7,7 @@ from varname import nameof
 from src.simulators import simulator
 from src.scasp_functions import scaspharness
 
-from src.analogy_learning import virtualhome_data_ingest, nlp, llm
+from src.analogy_learning import virtualhome_data_ingest, nlp, llm_helper
 from src.counterfactual_analysis import cfc_helper, counterfactual_checker
 
 def train_test_split_dict(data: dict, train_ratio=0.8, seed=None):
@@ -30,11 +30,8 @@ def train_test_split_dict(data: dict, train_ratio=0.8, seed=None):
 
 def counterfactual_verification(task, object_db):
     object_names = set()
-    objects = []
-    actions = []
-    for action in task.plan:
-        actions.append(cfc_helper.Action(action.time, action.action.lower(), action.objects[0].lower()))
-        object_names.add(action.objects[0])
+    objects = task.get_objects()
+    actions = task.get_actions()
     # character1
     objects.append(cfc_helper.VHObject("character", 1, characters=True, inside=["kitchen1"]))
     for object in object_names:
@@ -191,7 +188,7 @@ def generate_queries_from_object(object, degrees_of_difference):
 def full_analogy():
     logging.info("Initializing databases...")
     # Initialize s(CASP) Harness and LLM
-    llm = llm.LocalLLM()
+    llm = llm_helper.LocalLLM()
     sim = simulator.MockSimulator()
     scasp = scaspharness.ScaspHarness(sim, multiple_worlds=True)
     # Ingest all VH Dataset Plans and VH Objects
@@ -213,9 +210,7 @@ def full_analogy():
         # example_valid = counterfactual_verification(train[sim_key], objects_db)
         # logging.info("Example validity: " + str(example_valid))
         # Get all objects in training task
-        object_names = set()
-        for action in train[sim_key].plan:
-            object_names.add(action.objects[0])
+        object_names = train[sim_key].get_objects()
         logging.info("Valid objects: " + str(object_names))
         for object in object_names:
             name_only = re.sub(r'\d+', '', object)
@@ -253,4 +248,4 @@ def full_analogy():
 if __name__ == '__main__':
     logging.getLogger("httpcore").setLevel(logging.WARNING)
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    full_analogy()
+    virtualhome_data_ingest.generate_task_postconditions()

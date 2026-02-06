@@ -1,8 +1,9 @@
 from pathlib import Path
 import re
 import pickle
+from collections import defaultdict
 
-from src.counterfactual_analysis.cfc_helper import VHObject
+from src.counterfactual_analysis import cfc_helper
 from src.simulators import simulator_virtualhome
 
 class VH_Task():
@@ -11,6 +12,25 @@ class VH_Task():
 		self.description = description
 		self.preconditions = preconditions
 		self.plan = plan
+
+	def get_objects(self):
+		object_names = set()
+		for action in self.plan:
+			if len(action.objects) > 0:
+				object_names.add(re.sub(r'[^A-Za-z0-9]', '', action.objects[0]))
+		return object_names
+
+	def get_actions(self):
+		actions = []
+		for action in self.plan:
+			if action.action.lower() == "putback":
+				actions.append(cfc_helper.Action(action.time, action.action.lower(), action.objects[1].lower()))
+			elif len(action.objects) > 0:
+				actions.append(cfc_helper.Action(action.time, action.action.lower(), action.objects[0].lower()))
+			else:
+				actions.append(cfc_helper.Action(action.time, action.action.lower(), None))
+		return actions
+
 
 class Action:
 	def __init__(self, time, action, objects=None):
@@ -29,6 +49,116 @@ class Action:
 		elif isinstance(self.objects, str):
 			object = self.objects
 		print(str(self.time) + ") [" + self.action + "] " + object)
+
+def format_for_vecsr_tasks(predicates, lists, objects, task):
+	def format_item(item):
+		# Nested list → [a, b]
+		if isinstance(item, list):
+			return "[" + ", ".join(item) + "]"
+		# Atom
+		return item
+
+	task_literal = fix_unsafe_literals(re.sub(r'[^A-Za-z ]', '', task)
+	                                   .lower()
+	                                   .replace(" ", "_")
+	                                   .replace("\n", ""))
+	type_predicate_list = ""
+	variable_list = "["
+	get_relevant = ""
+	complete_task = ""
+	formatted_preds = []
+
+	for pred, items in zip(predicates, lists):
+		if items:
+			inner = ", ".join(format_item(i) for i in items)
+			formatted_preds.append(f"{pred}([{inner}])")
+		else:
+			formatted_preds.append(f"{pred}([])")
+
+	final_state = "[" + ", ".join(formatted_preds) + "]"
+	for object in objects:
+		name_only = re.sub(r'\d+', '', object)
+		name_only = name_only.replace("_", "")
+		name_only = fix_unsafe_literals(name_only)
+		if "room" in name_only or name_only in ["kitchen", "homeoffice", "entrancehall"]:
+			final_state = final_state.replace(", " + object + ", ", "").replace(", " + object, "").replace(object + ", ", "").replace(object, "")
+			continue
+		variable_version = object.upper()
+		type_predicate_list = type_predicate_list + "type(" + variable_version + ", " + name_only + "), "
+		final_state = final_state.replace(object, variable_version)
+		variable_list = variable_list + variable_version + ", "
+	type_predicate_list = type_predicate_list.rstrip(", ")
+	variable_list = variable_list.rstrip(", ") + "]"
+	if variable_list != "[]":
+		get_relevant = "get_relevant(" + task_literal + ", " + variable_list + ") :-\n\t" + type_predicate_list + "."
+		complete_task = "complete_task(" + task_literal + ", P) :-\n\t" + type_predicate_list + ",\n\t" + "transform(" + final_state + ", P)."
+		return get_relevant + "\n" + complete_task
+	else:
+		return ""
+
+def compile_predicate_lists(facts_str):
+	base_predicates = [
+		"close",
+		"holds",
+		"sat_on",
+		"on_top_of",
+		"inside",
+		"on",
+		"laid_on",
+		"used",
+		"eaten"
+	]
+
+	predicate_map = {
+		"held": "holds",
+		"sat_on": "sat_on",
+		"on": "on",
+		"close": "close",
+		"ontopof": "on_top_of"
+	}
+
+	# Predicates that preserve multiple arguments
+	multi_arg_predicates = {"on_top_of"}
+
+	# For binary predicates, which argument to keep (0-based, ignoring time)
+	arg_selection = {
+		"close": 0   # take FIRST argument instead of second
+	}
+
+	collected = defaultdict(list)
+	seen_predicates = set()
+
+	pattern = re.compile(r"(\w+)\(([^)]+)\)\.")
+
+	def add_unique(lst, item):
+		if item not in lst:
+			lst.append(item)
+
+	for match in pattern.finditer(facts_str):
+		pred, args = match.groups()
+		args = [a.strip() for a in args.split(",")]
+
+		out_pred = predicate_map.get(pred, pred)
+		seen_predicates.add(out_pred)
+
+		# Multi-argument predicate (ignore time)
+		if out_pred in multi_arg_predicates and len(args) >= 3:
+			add_unique(collected[out_pred], args[:-1])
+
+		# Unary predicate
+		elif len(args) == 2:
+			add_unique(collected[out_pred], args[0])
+
+		# Binary predicate
+		elif len(args) == 3:
+			idx = arg_selection.get(out_pred, 1)  # default = second argument
+			add_unique(collected[out_pred], args[idx])
+
+	optional_preds = sorted(seen_predicates - set(base_predicates))
+	full_predicate_order = base_predicates + optional_preds
+
+	result = [collected.get(pred, []) for pred in full_predicate_order]
+	return result, full_predicate_order
 
 def parse_command(s):
 	result = []
@@ -82,7 +212,7 @@ def pickle_virtualhome_data():
 				# TODO: read preconditions
 	pickle.dump(tasks, open("src/analogy_learning/vh_tasks_db.pkl", 'wb'))
 
-def unpickle_virtualhome_data(use_llm_data=True):
+def unpickle_virtualhome_data():
 	loaded = {}
 	if Path("src/analogy_learning/vh_tasks_db.pkl").is_file():
 		loaded = pickle.load(open("src/analogy_learning/vh_tasks_db.pkl", 'rb'))
@@ -104,7 +234,7 @@ def pickle_virtualhome_objects():
 	for node in graph["nodes"]:
 		if node["class_name"] in objects:
 			continue
-		objects[node["class_name"]] = VHObject(node["class_name"], node["id"])
+		objects[node["class_name"]] = cfc_helper.VHObject(node["class_name"], node["id"])
 		if "GRABBABLE" in node["properties"]:
 			objects[node["class_name"]].grabbable = True
 		if "EATABLE" in node["properties"]:
@@ -177,11 +307,11 @@ def pickle_virtualhome_objects():
 			objects[node["class_name"]].drinkable = True
 	pickle.dump(objects, open("src/analogy_learning/vh_objects_db.pkl", 'wb'))
 
-def unpickle_virtualhome_objects():
+def unpickle_virtualhome_objects(use_llm_data=False):
 	data = {}
 	if Path("src/analogy_learning/vh_objects_db.pkl").is_file():
 		data = pickle.load(open("src/analogy_learning/vh_objects_db.pkl", 'rb'))
-	if Path("src/analogy_learning/llm_objects_db.pkl").is_file():
+	if use_llm_data and Path("src/analogy_learning/llm_objects_db.pkl").is_file():
 		data = pickle.load(open("src/analogy_learning/llm_objects_db.pkl", 'rb')) | data
 	return data
 
@@ -189,3 +319,41 @@ def print_virtualhome_objects(objects):
 	for key in objects:
 		print(key)
 		objects[key].print(properties_only=True)
+
+def fix_unsafe_literals(name):
+	"""Replace 'table' with 'tabl' if it is exactly 'table'."""
+	to_return = name
+	if name == "table":
+		to_return = "tabl"
+	elif name == "hide":
+		to_return = "hides"
+	return to_return
+
+def generate_task_postconditions():
+	plans = unpickle_virtualhome_data()
+	# For every plan in the database
+	scasp_task_definitions = ""
+	for plankey in plans:
+		# Get all objects in the plan
+		objects = plans[plankey].get_objects()
+		actions = plans[plankey].get_actions()
+		# For every object in plan
+		rules = ""
+		for object in objects:
+			# Turn every object into a cfc VHObject
+			name_only = re.sub(r'\d+', '', object)
+			name_only = name_only.replace("_", "")
+			name_only = fix_unsafe_literals(name_only)
+			number_only = re.sub(r"\D", "", object)
+			vh_object = cfc_helper.VHObject(name_only, number_only)
+			# Use cfc_helper function to get updated object
+			info = vh_object.get_scasp(actions=actions, final=True)
+			rules = rules + "\n" + info
+		# Transform objects into format for task completion
+		rules = "\n".join(line for line in rules.splitlines() if line.strip())
+		lists, predicates = compile_predicate_lists(rules)
+		scasp_task_definitions = scasp_task_definitions + "% " + plans[plankey].task \
+		                         + format_for_vecsr_tasks(predicates, lists, objects, plans[plankey].task) + "\n\n"
+	with open("scasp_knowledge_base/generated_vh_task_list.pl", "w", encoding="utf-8") as out:
+		out.write(scasp_task_definitions)
+

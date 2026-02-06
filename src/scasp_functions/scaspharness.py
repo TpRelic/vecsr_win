@@ -304,7 +304,7 @@ class ScaspHarness():
 			main_rule = main_rule.split(":-")[0]
 			main_rule = self.prolog_count(main_rule)
 			if main_rule in relevant_rules:
-				if "not" in rule and not "not_" in rule:
+				if "not" in rule and not "not_" in rule and not "get_relevant" in rule and not "complete_task" in rule:
 					r_rules.append(rule.replace("not", "not "))
 				else:
 					r_rules.append(rule)

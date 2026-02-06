@@ -2,6 +2,8 @@ import logging
 import time
 import datetime
 
+from pathlib import Path
+
 def run(task, program, answer=None, take_actions=True):
     start_time = time.time()
     logging.info("Task: " + task)
@@ -42,6 +44,16 @@ def check_results(results):
         logging.warning("No valid initial state.")
         return False
 
+def concatenate_files(input_filenames, output_filename):
+    output_path = Path(output_filename)
+
+    with output_path.open("w", encoding="utf-8") as outfile:
+        for filename in input_filenames:
+            input_path = Path(filename)
+            with input_path.open("r", encoding="utf-8") as infile:
+                outfile.write(infile.read())
+                outfile.write("\n")
+
 def task_helper(task):
     # Dictionary with the key being the task name
     # Format: [final_state, answer_key, rooms]
@@ -79,4 +91,7 @@ def task_helper(task):
                      [74, 336]]  # 14
     tasks["prepare_letter_for_mailing"] = ["", "", [207, 74, 336, 11]]
     tasks["generic"] = ["", "", [207, 74, 336, 11]]
-    return tasks[task]
+    if task in tasks:
+        return tasks[task]
+    else:
+        return ["", "", None]

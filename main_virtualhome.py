@@ -4,7 +4,7 @@ import datetime
 
 from src.scasp_functions import scaspharness
 from src.simulators import simulator_virtualhome
-from src.main_helpers import run, check_results, task_helper
+from src.main_helpers import run, check_results, task_helper, concatenate_files
 from src.counterfactual_analysis import counterfactual_checker
 
 def state_subset(final_state, curr_state):
@@ -101,16 +101,21 @@ def run_cfa(actions, relevant, simulator):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    initial_rules_file = "scasp_knowledge_base/knowledge_base_virtualhome_v2.pl"
+    concatenate_files(["scasp_knowledge_base/knowledge_base_virtualhome_v2.pl",
+                       "scasp_knowledge_base/analogy_knowledge.pl",
+                       # "scasp_knowledge_base/vh_task_list.pl",
+                       "scasp_knowledge_base/generated_vh_task_list.pl"],
+                      "scasp_knowledge_base/generated_kb.pl")
+    initial_rules_file = "scasp_knowledge_base/generated_kb.pl"
     values = [True,     # 0 Real simulator or not?
-              True,     # 1 Optimize by dependency graph or not?
+              False,     # 1 Optimize by dependency graph or not?
               True,     # 2 Partially ground to remove unnecessary items or not?
               False,    # 3 Run dynamically or not?
               False,    # 4 Use an answer key or not?
               False,    # 5 Get plans step by step or not?
               True,     # 6 Only use relevant modules/rooms or not?
               False,    # 7 Counterfactual analysis?
-              "read"    # 8 Task to complete
+              "read_book"    # 8 Task to complete
               ]
     best = False
     best_norelitems = False

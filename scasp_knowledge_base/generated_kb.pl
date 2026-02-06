@@ -1,27 +1,3 @@
-% Current State
-current_time(1).
-type(book192, book).
-closed(book192).
-grabbable(book192).
-cuttable(book192).
-can_open(book192).
-readable(book192).
-has_paper(book192).
-movable(book192).
-props(book192).
-type(character1, character).
-characters(character1).
-closed_list([book192]).
-inside([[character1, kitchen207], [book192, bedroom74], [book192, bookshelf107]]).
-ontopof([[book192, bookshelf107]]).
-close([[kitchencounterdrawer242, character1], [character1, faucet249], [character1, bellpepper326], [character1, cutleryknife272], [character1, plate315], [character1, plate286], [character1, plate278], [coffeemaker307, character1], [character1, whippedcream319], [character1, kitchencounterdrawer243], [kitchencounter238, character1], [kitchencabinet234, character1], [character1, coffeepot308], [character1, coffeemaker307], [character1, kitchencabinet234], [character1, kitchencounterdrawer242], [rug254, character1], [character1, bellpepper323], [whippedcream319, character1], [cutleryfork277, character1], [character1, kitchencounterdrawer244], [cutleryfork280, character1], [character1, kitchencabinet236], [character1, dishwashingliquid268], [microwave314, character1], [kitchencounterdrawer240, character1], [bellpepper321, character1], [character1, waterglass283], [character1, microwave314], [book269, character1], [character1, kitchencounter238], [character1, pie320], [character1, kitchencounterdrawer241], [character1, kitchencounterdrawer245], [character1, plate274], [rug253, character1], [sink247, character1], [bench233, character1], [character1, book269], [kitchencounterdrawer244, character1], [character1, cutleryknife284], [character1, cutleryfork277], [cutleryfork273, character1], [cutleryknife281, character1], [character1, waterglass275], [bellpepper324, character1], [character1, cutleryknife281], [bellpepper322, character1], [character1, waterglass271], [kitchencounterdrawer246, character1], [character1, kitchencounterdrawer246], [plate279, character1], [coffeepot308, character1], [character1, bellpepper325], [plate274, character1], [character1, plate279], [character1, cutleryfork285], [character1, kitchencabinet237], [waterglass275, character1], [dishwashingliquid268, character1], [character1, kitchentable231], [character1, cutleryfork280], [character1, dishbowl327], [character1, breadslice311], [character1, rug254], [cutleryknife284, character1], [plate315, character1], [character1, bellpepper322], [bellpepper326, character1], [dishbowl327, character1], [waterglass283, character1], [character1, salmon328], [character1, waterglass282], [waterglass282, character1], [character1, bellpepper324], [kitchencounterdrawer239, character1], [faucet249, character1], [breadslice310, character1], [kitchencabinet235, character1], [character1, bench233], [pie320, character1], [character1, kitchencounterdrawer240], [toaster309, character1], [bellpepper323, character1], [waterglass271, character1], [kitchentable231, character1], [character1, sink247], [character1, rug253], [kitchencounterdrawer243, character1], [salmon328, character1], [character1, cutleryfork273], [character1, washingsponge267], [breadslice311, character1], [plate286, character1], [bellpepper325, character1], [cutleryfork285, character1], [cutleryknife272, character1], [kitchencounterdrawer241, character1], [kitchencabinet236, character1], [character1, kitchencabinet235], [kitchencabinet237, character1], [plate278, character1], [kitchencounterdrawer245, character1], [character1, toaster309], [washingsponge267, character1], [character1, breadslice310], [character1, kitchencounterdrawer239], [character1, bellpepper321]]).
-inside_character([kitchen207]).
-close_character([kitchentable231, bench233, kitchencabinet234, kitchencabinet235, kitchencabinet236, kitchencabinet237, kitchencounter238, kitchencounterdrawer239, kitchencounterdrawer240, kitchencounterdrawer241, kitchencounterdrawer242, kitchencounterdrawer243, kitchencounterdrawer244, kitchencounterdrawer245, kitchencounterdrawer246, sink247, faucet249, rug253, rug254, washingsponge267, dishwashingliquid268, book269, waterglass271, cutleryknife272, cutleryfork273, plate274, waterglass275, cutleryfork277, plate278, plate279, cutleryfork280, cutleryknife281, waterglass282, waterglass283, cutleryknife284, cutleryfork285, plate286, coffeemaker307, coffeepot308, toaster309, breadslice310, breadslice311, microwave314, plate315, whippedcream319, pie320, bellpepper321, bellpepper322, bellpepper323, bellpepper324, bellpepper325, bellpepper326, dishbowl327, salmon328]).
-rooms(bathroom11).
-rooms(bedroom74).
-rooms(kitchen207).
-rooms(livingroom336).
-% Rules
 % Extra "facts" about objects that exist in the dataset but not the simulation
 % This is required because the VirtualHome simulation does not include everything
 % needed to complete every task in their database. As an example, although the
@@ -16263,6 +16239,3 @@ complete_task(try_yourself_off, P) :-
 	transform([close([CLOSET1]), holds([]), sat_on([]), on_top_of([[TOWEL1, BASKETFORCLOTHES1]]), inside([]), on([]), laid_on([]), used([]), eaten([]), closed([CLOSET1]), wipe([FEETBOTH1, ARMSBOTH1, FACE1, LEGSBOTH1])], P).
 
 
-
-
-?- complete_task(read_book, P).

@@ -114,86 +114,87 @@ class VHObject:
 	def set_number(self, num):
 		self.number = num
 		self.name = self.type + str(self.number)
-	def get_scasp(self, actions=None, properties_only=False):
+	def get_scasp(self, actions=None, properties_only=False, final=False):
 		rules = ""
-		if not properties_only:
-			rules = "type(" + self.name + ", " + self.type + ").\n"
-		if self.grabbable:
-			rules = rules + "grabbable(" + self.name + ").\n"
-		if self.eatable:
-			rules = rules + "eatable(" + self.name + ").\n"
-		if self.can_open:
-			rules = rules + "can_open(" + self.name + ").\n"
-		if self.sittable:
-			rules = rules + "sittable(" + self.name + ").\n"
-		if self.lieable:
-			rules = rules + "lieable(" + self.name + ").\n"
-		if self.movable:
-			rules = rules + "movable(" + self.name + ").\n"
-		if self.surfaces:
-			rules = rules + "surfaces(" + self.name + ").\n"
-		if self.has_switch:
-			rules = rules + "has_switch(" + self.name + ").\n"
-		if self.rooms:
-			rules = rules + "rooms(" + self.name + ").\n"
-		if self.floor:
-			rules = rules + "floor(" + self.name + ").\n"
-		if self.walls:
-			rules = rules + "walls(" + self.name + ").\n"
-		if self.ceiling:
-			rules = rules + "ceiling(" + self.name + ").\n"
-		if self.decor:
-			rules = rules + "decor(" + self.name + ").\n"
-		if self.cover_object:
-			rules = rules + "cover_object(" + self.name + ").\n"
-		if self.lamps:
-			rules = rules + "lamps(" + self.name + ").\n"
-		if self.furniture:
-			rules = rules + "furniture(" + self.name + ").\n"
-		if self.containers:
-			rules = rules + "containers(" + self.name + ").\n"
-		if self.doors:
-			rules = rules + "doors(" + self.name + ").\n"
-		if self.props:
-			rules = rules + "props(" + self.name + ").\n"
-		if self.pourable:
-			rules = rules + "pourable(" + self.name + ").\n"
-		if self.cream:
-			rules = rules + "cream(" + self.name + ").\n"
-		if self.recipient:
-			rules = rules + "recipient(" + self.name + ").\n"
-		if self.windows:
-			rules = rules + "windows(" + self.name + ").\n"
-		if self.has_plug:
-			rules = rules + "has_plug(" + self.name + ").\n"
-		if self.electronics:
-			rules = rules + "electronics(" + self.name + ").\n"
-		if self.appliances:
-			rules = rules + "appliances(" + self.name + ").\n"
-		if self.hangable:
-			rules = rules + "hangable(" + self.name + ").\n"
-		if self.clothes:
-			rules = rules + "clothes(" + self.name + ").\n"
-		if self.lookable:
-			rules = rules + "lookable(" + self.name + ").\n"
-		if self.has_paper:
-			rules = rules + "has_paper(" + self.name + ").\n"
-		if self.cuttable:
-			rules = rules + "cuttable(" + self.name + ").\n"
-		if self.readable:
-			rules = rules + "readable(" + self.name + ").\n"
-		if self.characters:
-			rules = rules + "characters(" + self.name + ").\n"
-		if self.food:
-			rules = rules + "food(" + self.name + ").\n"
-		if self.drinkable:
-			rules = rules + "drinkable(" + self.name + ").\n"
-		if properties_only:
-			return rules
-		rules = rules + self.time_scasp_helper(self.name, 0, closed = self.closed, open = self.open, on = self.on, off = self.off,
-	                      held = self.held, sat_on = self.sat_on, laid_on = self.laid_on, used = self.used, eaten = self.eaten,
-	                      sitting = self.sitting, laying = self.laying,
-	                      inside = self.inside, ontopof = self.ontopof, close = self.close, facing = self.facing)
+		if not final:
+			if not properties_only:
+				rules = "type(" + self.name + ", " + self.type + ").\n"
+			if self.grabbable:
+				rules = rules + "grabbable(" + self.name + ").\n"
+			if self.eatable:
+				rules = rules + "eatable(" + self.name + ").\n"
+			if self.can_open:
+				rules = rules + "can_open(" + self.name + ").\n"
+			if self.sittable:
+				rules = rules + "sittable(" + self.name + ").\n"
+			if self.lieable:
+				rules = rules + "lieable(" + self.name + ").\n"
+			if self.movable:
+				rules = rules + "movable(" + self.name + ").\n"
+			if self.surfaces:
+				rules = rules + "surfaces(" + self.name + ").\n"
+			if self.has_switch:
+				rules = rules + "has_switch(" + self.name + ").\n"
+			if self.rooms:
+				rules = rules + "rooms(" + self.name + ").\n"
+			if self.floor:
+				rules = rules + "floor(" + self.name + ").\n"
+			if self.walls:
+				rules = rules + "walls(" + self.name + ").\n"
+			if self.ceiling:
+				rules = rules + "ceiling(" + self.name + ").\n"
+			if self.decor:
+				rules = rules + "decor(" + self.name + ").\n"
+			if self.cover_object:
+				rules = rules + "cover_object(" + self.name + ").\n"
+			if self.lamps:
+				rules = rules + "lamps(" + self.name + ").\n"
+			if self.furniture:
+				rules = rules + "furniture(" + self.name + ").\n"
+			if self.containers:
+				rules = rules + "containers(" + self.name + ").\n"
+			if self.doors:
+				rules = rules + "doors(" + self.name + ").\n"
+			if self.props:
+				rules = rules + "props(" + self.name + ").\n"
+			if self.pourable:
+				rules = rules + "pourable(" + self.name + ").\n"
+			if self.cream:
+				rules = rules + "cream(" + self.name + ").\n"
+			if self.recipient:
+				rules = rules + "recipient(" + self.name + ").\n"
+			if self.windows:
+				rules = rules + "windows(" + self.name + ").\n"
+			if self.has_plug:
+				rules = rules + "has_plug(" + self.name + ").\n"
+			if self.electronics:
+				rules = rules + "electronics(" + self.name + ").\n"
+			if self.appliances:
+				rules = rules + "appliances(" + self.name + ").\n"
+			if self.hangable:
+				rules = rules + "hangable(" + self.name + ").\n"
+			if self.clothes:
+				rules = rules + "clothes(" + self.name + ").\n"
+			if self.lookable:
+				rules = rules + "lookable(" + self.name + ").\n"
+			if self.has_paper:
+				rules = rules + "has_paper(" + self.name + ").\n"
+			if self.cuttable:
+				rules = rules + "cuttable(" + self.name + ").\n"
+			if self.readable:
+				rules = rules + "readable(" + self.name + ").\n"
+			if self.characters:
+				rules = rules + "characters(" + self.name + ").\n"
+			if self.food:
+				rules = rules + "food(" + self.name + ").\n"
+			if self.drinkable:
+				rules = rules + "drinkable(" + self.name + ").\n"
+			if properties_only:
+				return rules
+			rules = rules + self.time_scasp_helper(self.name, 0, closed = self.closed, open = self.open, on = self.on, off = self.off,
+		                      held = self.held, sat_on = self.sat_on, laid_on = self.laid_on, used = self.used, eaten = self.eaten,
+		                      sitting = self.sitting, laying = self.laying,
+		                      inside = self.inside, ontopof = self.ontopof, close = self.close, facing = self.facing)
 		if actions:
 			closed = self.closed
 			open = self.open
@@ -210,20 +211,21 @@ class VHObject:
 			ontopof = self.ontopof
 			close = self.close
 			facing = self.facing
+			special_rules = ""
 			for action in actions:
 				# If we are a character, do...
 				if self.type == "character":
-					if action.action == "walk" and action.object in rooms:
+					if action.action.lower() in ["walk"] and action.object in rooms:
 						inside = [action.object]
-					elif action.action == "walk":
+					elif action.action.lower() in ["walk"]:
 						close = [action.object]
 					# elif action.action == "grab":
 					# 	continue
-					elif action.action == "sit":
+					elif action.action.lower() in ["sit"]:
 						sitting = True
-					elif action.action == "lie":
+					elif action.action.lower() in ["lie"]:
 						laying = True
-					elif action.action == "standup":
+					elif action.action.lower() in ["standup"]:
 						sitting = False
 						laying = False
 					# elif action.action == "put":
@@ -242,52 +244,68 @@ class VHObject:
 					# 	continue
 				# If the action is being enacted on us...
 				elif self.name == action.object:
-					if action.action == "walk" and held and action.object in rooms:
+					if action.action.lower() in ["walk"] and held and action.object in rooms:
 						inside = [action.object]
-					elif action.action == "walk" and held:
+					elif action.action.lower() in ["walk"] and held:
 						close = [action.object]
-					elif action.action == "grab":
+					# Final conditions only statements
+					elif final and action.action.lower() in ["walk"] and \
+							("room" not in self.name and self.type not in ["kitchen","homeoffice","entrancehall"]):
+						close = [action.object]
+					elif action.action.lower() in ["grab"]:
 						held = True
 						ontopof = []
 						inside = [x for x in inside if x in rooms]
-					elif action.action == "sit":
+					elif action.action.lower() in ["sit"]:
 						sat_on = True
-					elif action.action == "lie":
+					elif action.action.lower() in ["lie"]:
 						laid_on = True
-					elif action.action == "standup":
+					elif action.action.lower() in ["standup"]:
 						sat_on = False
 						laid_on = False
-					elif action.action == "switch_on":
+					elif action.action.lower() in ["switch_on", "switchon"]:
 						on = True
 						off = False
-					elif action.action == "switch_off":
+					elif action.action.lower() in ["switch_off", "switchoff"]:
 						on = False
 						off = True
-					elif action.action == "use":
+					elif action.action.lower() in ["use"]:
 						used = True
-					elif action.action == "eat":
+					elif action.action.lower() in ["eat"]:
 						eaten = True
-					elif action.action == "open":
+					elif action.action.lower() in ["open"]:
 						open = True
 						closed = False
-					elif action.action == "close":
+					elif action.action.lower() in ["close"]:
 						open = False
 						closed = True
+					elif action.action.lower() in ["putobjback", "putoff"]:
+						held = False
+					elif action.action.lower() not in ["walk", "find", "put", "putback", "lookat", "pointat", "turnto"]:
+						special_rules = special_rules + "\n" + action.action.lower() + "(" + self.name + ", " + str(action.time) + ")."
 				elif held:
-					if action.action == "walk" and action.object in rooms:
+					if action.action.lower() in ["walk"] and action.object in rooms:
 						inside = [action.object, "character1"]
-					elif action.action == "walk":
+					elif action.action.lower() in ["walk"]:
 						close = [action.object, "character1"]
-					elif action.action == "put":
+					elif action.action.lower() in ["put","putback"]:
 						ontopof.append(action.object)
 						held = False
 				elif action.action == "walk" and action.object in close:
 					close.append("character1")
+				elif not action.object:
+					special_rules = special_rules + "\n" + action.action.lower() + "(character1, 0)."
 				rules = rules + self.time_scasp_helper(self.name, action.time, closed=closed, open=open, on=on, off=off,
 				                       held=held, sat_on=sat_on, laid_on=laid_on, used=used,
 				                       eaten=eaten,
 				                       sitting=sitting, laying=laying,
 				                       inside=inside, ontopof=ontopof, close=close, facing=facing)
+			if final:
+				return self.time_scasp_helper(self.name, 0, closed=closed, open=open, on=on, off=off,
+					                       held=held, sat_on=sat_on, laid_on=laid_on, used=used,
+					                       eaten=eaten,
+					                       sitting=sitting, laying=laying,
+					                       inside=inside, ontopof=ontopof, close=close, facing=facing) + special_rules
 		return rules
 
 	@staticmethod
