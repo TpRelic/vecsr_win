@@ -1,0 +1,30 @@
+---
+ log_level: "info"
+ file_info:
+   input_knowledge_base_files: # A list of all files to combine into the knowledge base
+    - "scasp_knowledge_base/knowledge_base_virtualhome_v2.pl"
+    - "scasp_knowledge_base/analogy_knowledge.pl"
+    #  - "scasp_knowledge_base/vh_task_list.pl"
+    - "scasp_knowledge_base/generated_vh_task_list_modified_singletons.pl"
+   final_knowledge_base_file: "scasp_knowledge_base/generated_kb.pl" # Name of the combined kb
+ vecsr_settings:
+  use_real_simulator: True # Real simulator or not?
+  run_dynamically: False # Run dynamically or not?
+  use_answer_key: False # Use an answer key or not?
+  step_by_step: False # Get plans step by step or not?
+  counterfactual_analysis: False # Counterfactual analysis?
+  take_actions_in_sim: False # Actually take actions in simulation?
+  optimizations: # Optimizations from VECSR debut in ICLP 2025
+    dependency_graph: False # Optimize by dependency graph or not?
+    partial_ground: True # Partially ground to remove unnecessary items or not?
+    modules: True # Only use relevant modules/rooms or not?
+  tasks: # Note: Multiple tasks is only supported on MacOS currently
+   - "watch_tv"
+   - "read_book"
+   - "browse_internet"
+   - "relax_on_sofa"
+ vecsra_settings:
+   scasp_client: # If using as s(CASP) client machine, set to true and include the IP Address for the s(CASP) server
+     enabled: True
+     ip_address: "192.168.1.135"
+   task: "loc(70,0,-10)" # Task for drone, currently only able to be set to a location to navigate to

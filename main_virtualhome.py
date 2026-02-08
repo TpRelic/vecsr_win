@@ -1,10 +1,12 @@
 import logging
 import time
 import datetime
+import yaml
+import sys
 
 from src.scasp_functions import scaspharness
 from src.simulators import simulator_virtualhome
-from src.main_helpers import run, check_results, task_helper, concatenate_files
+from src.main_helpers import run, check_results, task_helper, concatenate_files, asrun, as_is_runnning
 from src.counterfactual_analysis import counterfactual_checker
 
 def state_subset(final_state, curr_state):
@@ -99,104 +101,85 @@ def run_cfa(actions, relevant, simulator):
     objects, actions = counterfactual_checker.format_objects_and_actions(actions, relevant, simulator)
     counterfactual_checker.counterfactual_checker(objects, actions)
 
+def start_vh():
+    logging.debug("Starting VirtualHome executable.")
+    cmd = '''
+    tell application "macos_exec.2.2.4"
+	    activate
+    end tell
+    '''
+    asrun(cmd)
+    while not as_is_runnning("VirtualHome"):
+        time.sleep(2)
+    time.sleep(5)
+
+def stop_vh():
+    logging.debug("Stopping VirtualHome executable.")
+    cmd = '''
+    tell application "macos_exec.2.2.4"
+	    quit
+    end tell
+    '''
+    asrun(cmd)
+    while as_is_runnning("VirtualHome"):
+        time.sleep(2)
+    time.sleep(5)
+
 if __name__ == '__main__':
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    concatenate_files(["scasp_knowledge_base/knowledge_base_virtualhome_v2.pl",
-                       "scasp_knowledge_base/analogy_knowledge.pl",
-                       # "scasp_knowledge_base/vh_task_list.pl",
-                       "scasp_knowledge_base/generated_vh_task_list.pl"],
-                      "scasp_knowledge_base/generated_kb.pl")
-    initial_rules_file = "scasp_knowledge_base/generated_kb.pl"
-    values = [True,     # 0 Real simulator or not?
-              False,     # 1 Optimize by dependency graph or not?
-              True,     # 2 Partially ground to remove unnecessary items or not?
-              False,    # 3 Run dynamically or not?
-              False,    # 4 Use an answer key or not?
-              False,    # 5 Get plans step by step or not?
-              True,     # 6 Only use relevant modules/rooms or not?
-              False,    # 7 Counterfactual analysis?
-              "read_book"    # 8 Task to complete
-              ]
-    best = False
-    best_norelitems = False
-    best_noopt = False
-    best_norelrooms = False
-    only_relitems = False
-    only_opt = False
-    only_relrooms = False
-    nothing = False
-    if best:
-        values[1] = True
-        values[2] = True
-        values[6] = True
-    if best_norelitems:
-        values[1] = True
-        values[2] = False
-        values[6] = True
-    if best_noopt:
-        values[1] = False
-        values[2] = True
-        values[6] = True
-    if best_norelrooms:
-        values[1] = True
-        values[2] = True
-        values[6] = False
-    if only_relitems:
-        values[1] = False
-        values[2] = True
-        values[6] = False
-    if only_opt:
-        values[1] = True
-        values[2] = False
-        values[6] = False
-    if only_relrooms:
-        values[1] = False
-        values[2] = False
-        values[6] = True
-    if nothing:
-        values[1] = False
-        values[2] = False
-        values[6] = False
-    real_simulator = values[0]
-    optimize_rules = values[1]
-    reduce_items = values[2] # Remove all facts about non-relevant objects
-    dynamic = values[3]
-    use_answer_key = values[4]
-    step_by_step = values[5]
-    few_rooms = values[6]
-    cfa = values[7]
-    task = values[8]
-    [final_state, answer_key, rooms] = task_helper(task)
-    if not few_rooms:
-        rooms = None
-    start_time = time.time()
+    # Logging
+    with open("config/config.yml", "r") as f:
+        config = yaml.safe_load(f)
+    if config["log_level"].lower() == "info":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    elif config["log_level"].lower() == "debug":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    elif config["log_level"].lower() == "warn":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARN)
+    # Create knowledge base
+    concatenate_files(config["file_info"]["input_knowledge_base_files"],
+                      config["file_info"]["final_knowledge_base_file"])
+    initial_rules_file = config["file_info"]["final_knowledge_base_file"]
+
     logging.info("Start Time: %s", datetime.datetime.now())
-    # Create simulator
-    if real_simulator:
-        simulat = simulator_virtualhome.VirtualHomeSimulator(environment=0) # VirtualHome Simulator
-    else:
-        simulat = simulator_virtualhome.MockVirtualHomeSimulator() # Mock VirtualHome Simulator
-    # Create Harness
-    program = scaspharness.ScaspHarness(simulat, initial_rules=initial_rules_file, optimize_rules=optimize_rules, rooms=rooms)
-    if cfa:
-        program.initial_rules = program.initial_rules.replace("%dangerx", "")
-    logging.info("Program Initialized Time: %s seconds" % (time.time() - start_time))
-    start_time = time.time()
-    if reduce_items or cfa:
-        relevant = get_relevant(task)
-        if reduce_items:
-            program.relevant_items = relevant
-    # Full loop
-    if step_by_step:
-        run_step_by_step(task, final_state, program, state_subset)
-    elif not dynamic or cfa:
-        if use_answer_key:
-            actions = run(task, program, answer_key, take_actions=not cfa)
+
+    for task in config["vecsr_settings"]["tasks"]:
+        if sys.platform == "darwin":
+            start_vh()
+        [final_state, answer_key, rooms] = task_helper(task)
+        if not config["vecsr_settings"]["optimizations"]["modules"]:
+            rooms = None
+        start_time = time.time()
+        # Create simulator
+        if config["vecsr_settings"]["use_real_simulator"]:
+            simulat = simulator_virtualhome.VirtualHomeSimulator(environment=0) # VirtualHome Simulator
         else:
-            actions = run(task, program, take_actions=not cfa)
-        if cfa:
-            run_cfa(actions, relevant, simulat)
-    else:
-        while True:
-            task = input("Input task:")
-            run(task, program)
+            simulat = simulator_virtualhome.MockVirtualHomeSimulator() # Mock VirtualHome Simulator
+        # Create Harness
+        program = scaspharness.ScaspHarness(simulat, initial_rules=initial_rules_file, optimize_rules=config["vecsr_settings"]["optimizations"]["dependency_graph"], rooms=rooms)
+        if config["vecsr_settings"]["counterfactual_analysis"]:
+            program.initial_rules = program.initial_rules.replace("%dangerx", "")
+        logging.info("Program Initialized Time: %s seconds" % (time.time() - start_time))
+        start_time = time.time()
+        if config["vecsr_settings"]["optimizations"]["partial_ground"] or config["vecsr_settings"]["counterfactual_analysis"]:
+            relevant = get_relevant(task)
+            if config["vecsr_settings"]["optimizations"]["partial_ground"]:
+                program.relevant_items = relevant
+        # Full loop
+        if config["vecsr_settings"]["step_by_step"]:
+            run_step_by_step(task, final_state, program, state_subset)
+        elif not config["vecsr_settings"]["run_dynamically"] or config["vecsr_settings"]["counterfactual_analysis"]:
+            if config["vecsr_settings"]["use_answer_key"]:
+                actions = run(task, program, answer_key,
+                              take_actions=config["vecsr_settings"]["take_actions_in_sim"])
+            else:
+                actions = run(task, program, take_actions=config["vecsr_settings"]["take_actions_in_sim"])
+            if config["vecsr_settings"]["counterfactual_analysis"]:
+                run_cfa(actions, relevant, simulat)
+        else:
+            while True:
+                task = input("Input task:")
+                run(task, program, take_actions=config["vecsr_settings"]["take_actions_in_sim"])
+        if sys.platform == "darwin":
+            stop_vh()
+        else:
+            exit(0)

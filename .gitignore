@@ -210,6 +210,10 @@ cython_debug/
 /scasp_knowledge_base/tests
 /scasp_knowledge_base/generated_scasp.pl
 /scasp_knowledge_base/past_states.pl
+/scasp_knowledge_base/quick_test.py
+/scasp_knowledge_base/work.txt
+/scasp_knowledge_base/generated_kb.pl
+/scasp_knowledge_base/LLM-generated_objects_test.txt
 
 # VirtualHome dataset
 /src/programs_processed_precond_nograb_morepreconds/

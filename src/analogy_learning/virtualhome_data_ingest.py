@@ -333,6 +333,7 @@ def generate_task_postconditions():
 	plans = unpickle_virtualhome_data()
 	# For every plan in the database
 	scasp_task_definitions = ""
+	plans = {key: value for key, value in sorted(plans.items(), key=lambda item: item[1].task)}
 	for plankey in plans:
 		# Get all objects in the plan
 		objects = plans[plankey].get_objects()

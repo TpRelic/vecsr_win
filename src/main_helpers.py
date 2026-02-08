@@ -1,6 +1,7 @@
 import logging
 import time
 import datetime
+import subprocess
 
 from pathlib import Path
 
@@ -95,3 +96,19 @@ def task_helper(task):
         return tasks[task]
     else:
         return ["", "", None]
+
+def asrun(ascript):
+  "Run the given AppleScript and return the standard output."
+  osa = subprocess.run(['/usr/bin/osascript', '-'], input=ascript, text=True, capture_output=True)
+  if osa.returncode == 0:
+    return osa.stdout.rstrip()
+  else:
+    raise ChildProcessError(f'AppleScript: {osa.stderr.rstrip()}')
+
+def as_is_runnning(app):
+    logging.debug("Checking if " + app + " is running.")
+    count = int(subprocess.check_output(["osascript",
+                "-e", "tell application \"System Events\"",
+                "-e", "count (every process whose name is \"" + app + "\")",
+                "-e", "end tell"]).strip())
+    return count > 0

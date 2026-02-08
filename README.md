@@ -46,52 +46,6 @@ a. Restart if needed.
     - You can verify if it's open in WSL w/ `ip route | grep default` for `8080`
 10. Run main_virtualhome.py
 
-### Configuring VECSR for VirtualHome
-
-In the main function of main_virtualhome.py, there is a values array with the 
-configuration settings for VECSR for VirtualHome:
-```
-values = [True,     # 0 Real simulator or not?
-          True,     # 1 Optimize by dependency graph or not?
-          True,     # 2 Partially ground to remove unnecessary items or not?
-          False,    # 3 Run dynamically or not?
-          False,    # 4 Use an answer key or not?
-          False,    # 5 Get plans step by step or not?
-          True,     # 6 Only use relevant modules/rooms or not?
-          False,    # 7 Counterfactual analysis?
-          "read"    # 8 Task to complete
-          ]
-```
-0. When the first parameter is set to `True`, it uses the real VirtualHome 
-executable for connection. However, for testing purposes there is also a 
-simplified "mock" VirtualHome simulator that does not connect to VirtualHome
-that can be used by setting this value to `False`.
-1. This is the Dependency Graph optimization from 
-[Tudor et al. in ICLP 2025](https://cgi.cse.unsw.edu.au/~eptcs/paper.cgi?ICLP2025.7),
-where `True` enables and `False` disables. For best performance, keep this on. 
-Note: This optimization may produce errors if the knowledge base has any comments
-at the end of lines of code. Put all comments on their own lines to use this.
-2. This is the Partial Grounding optimization from
-[Tudor et al. in ICLP 2025](https://cgi.cse.unsw.edu.au/~eptcs/paper.cgi?ICLP2025.7),
-where `True` enables and `False` disables. For best performance, keep this on.
-Note: To use this feature there must be a matching `get_relevant` predicate for the
-task in the knowledge base. 
-3. This parameter determines whether the task is pulled from parameter 8 (`False`) or whether
-the user is prompted to provide task through the console (`True`). 
-4. This allows the user to provide a task plan directly in main_helpers.py and
-have that plan executed in VirtualHome without the need for s(CASP) reasoning 
-when set to `True`. `False` uses s(CASP) reasoning and is the norm.
-5. `False` means that the entire action plan will be determined with one call to
-s(CASP), and `True` means that the actions will be determined one at a time.
-6. This is the Modular optimization from
-[Tudor et al. in ICLP 2025](https://cgi.cse.unsw.edu.au/~eptcs/paper.cgi?ICLP2025.7),
-where `True` enables and `False` disables. For best performance, keep this on.
-7. This enables the counterfactual analysis module from Tudor et al. 
-(citation pending).
-8. This is the name of the task to be completed, which must be matched by both 
-a task in the task_helper of main_helper.py and by a `complete_task` predicate
-in the knowledge_base_virtualhome.pl
-
 ## Examples
 The examples referenced in ICLP 2025 are included under Examples.
 
@@ -156,6 +110,11 @@ To run VECSR as a s(CASP) server, use scasp_server.py, and to run on a machine w
 ### Simulation Video
 A demonstration video is available and linked here: [Video](https://drive.google.com/file/d/1dLcAfDx14L6Kk7PUr7tecDVNdlx4ec46/view?usp=sharing)
 
+## Configuring VECSR
+In config/config.yml there are settings for various configurations of VECSR 
+(main_virtualhome.py) and VECSR-A (main_airsim.py). These settings have comments
+describing their use.
+
 # How to Cite VECSR
 **In Publications:**
 
@@ -165,11 +124,11 @@ use one of the following citations:
 
 VECSR:
 
-      Tudor, A.R., Arias, J., Gupta, G.: VECSR: Virtually Embodied Common Sense Reasoning System. In: Proceedings 41st International Conference on Logic Programming, The University of Calabria, Arcavacata CS, Italy, September 12-19-2025. Electronic Proceedings in Theoretical Computer Science, Open Publishing Association (2025)
+    Tudor, A.R., Arias, J., Gupta, G.: VECSR: Virtually Embodied Common Sense Reasoning System. In: Proceedings 41st International Conference on Logic Programming, The University of Calabria, Arcavacata CS, Italy, September 12-19-2025. Electronic Proceedings in Theoretical Computer Science, Open Publishing Association (2025)
      
 VECSR-A:
 
-    Tudor, Alexis, Keegan Kimbrell, and Gopal Gupta. "Initial Review of Goal-Directed Answer Set Programming for Orchestration of Neuro-Symbolic UAV Autonomy." (2026).
+    Tudor, Alexis R., Keegan Kimbrell, and Gopal Gupta. "Initial Review of Goal-Directed Answer Set Programming for Orchestration of Neuro-Symbolic UAV Autonomy." (2026).
 
 **In Projects:**
 

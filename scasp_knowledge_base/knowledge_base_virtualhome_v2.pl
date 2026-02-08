@@ -287,6 +287,7 @@ state_subset([close(CloseFinal), holds(HoldsFinal), sat_on(SatFinal), on_top_of(
 % We want to go from the current state to the final state
 transform(FinalState, Plan) :- initial_state(State1), perturb(FinalState, PerturbedFinalState),
                                transform(State1, PerturbedFinalState, [State1], PerturbedPlan, 0),
+                               %-list_empty(PerturbedPlan),
                                unperturb_actions(FinalState, PerturbedPlan, Plan).
 transform(State1, PerturbedFinalState,_,[], _) :- state_subset(PerturbedFinalState, State1).
 transform(_, _, _, _, 30).
@@ -355,6 +356,12 @@ suggest(walk(X), _,
 suggest(grab(X), [close(CloseI), _, _, _, _, _, _, _, _ | _],
                  [close(CloseF), _, sat_on(Sat), _, _, _, _, _, _ | _])
                         :- not_member(Y, CloseI), member(Y, CloseF), member(X, Sat), -list_empty(CloseF).
+suggest(walk(X), [_, _, _, _, _, _, _, used(UseI), _ | _],
+                 [_, _, _, _, _, _, _, used(UseF), _ | _])
+                        :- member(X, UseF), not_member(X, UseI).
+suggest(use(X), _,
+                [_, _, _, _, _, _, _, used(Use), _ | _])
+                        :- member(X, Use).
 suggest(walk(X), [_, holds(Held), _, _, _, _, _, _, _ | _],
                  [close(Close), _, sat_on(Sat), _, _, _, _, _, _ | _])
                         :- member(X, Close), sittable(Y), X\=Y, member(Y, Sat), member(Y, Held).
@@ -369,12 +376,6 @@ suggest(walk(Room), [close(Close), holds(Holds), sat_on(Sat), on_top_of(Oto), in
 suggest(walk(X), _,
                 [close(Close), _, _, _, _, _, _, _, _ | _])
                         :- member(X, Close).
-suggest(walk(X), [_, _, _, _, _, _, _, used(UseI), _ | _],
-                 [_, _, _, _, _, _, _, used(UseF), _ | _])
-                        :- member(X, UseF), not_member(X, UseI).
-suggest(use(X), _,
-                [_, _, _, _, _, _, _, used(Use), _ | _])
-                        :- member(X, Use).
 suggest(eat(X), _,
                 [_, _, _, _, _, _, _, _, eaten(Eaten) | _])
                         :- member(X, Eaten).

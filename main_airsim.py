@@ -1,11 +1,12 @@
 import logging
 import time
 import datetime
+import yaml
 
 from src.scasp_functions import scaspharness
 from src.simulators import simulator_airsim
 from src.scasp_functions.scasp_client import ScaspClient
-from main_helpers import check_results
+from src.main_helpers import check_results
 
 def state_subset(final_state, curr_state):
     """
@@ -38,21 +39,30 @@ def run_airsim(final_state, program):
     logging.info("Task End Time: %s", datetime.datetime.now())
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-    task_selection = 0
-    tasks = ["navigate"]
-    final_state = ["loc(70,0,-10)"]
+    # Logging
+    with open("config/config.yml", "r") as f:
+        config = yaml.safe_load(f)
+    if config["log_level"].lower() == "info":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    elif config["log_level"].lower() == "debug":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    elif config["log_level"].lower() == "warn":
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARN)
+    final_state = config["vecsra_settings"]["task"]
+
+    # Create s(CASP) Client
+    scasp_client = None
+    if config["vecsra_settings"]["scasp_client"]["enabled"]:
+        scasp_client = ScaspClient(config["vecsra_settings"]["scasp_client"]["ip_address"])
 
     start_time = time.time()
     logging.info("Start Time: %s", datetime.datetime.now())
     # Create simulator
     simulat = simulator_airsim.AirSimSimulator()
-    # Create s(CASP) Client
-    scasp_client = ScaspClient("192.168.1.135")
     # Create Harness
     program = scaspharness.ScaspHarness(simulat, initial_rules="scasp_knowledge_base/knowledge_base_airsim.pl", scasp_client=scasp_client)
     logging.info("Program Initialized Time: %s seconds" % (time.time() - start_time))
     start_time = time.time()
 
     # Full loop
-    run_airsim(final_state[task_selection], program)
+    run_airsim(final_state, program)
