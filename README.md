@@ -27,21 +27,23 @@ first thirty lines of the main method are various parameters concerning levels
 of static analysis, which task to perform, and some quality of life features.
 
 ### Installation for Windows (WSL)
-VECSR was originally designed for MacOS, so you need to go through some extra setup on WSL to get it working.
+VECSR in VirtualHome was originally designed for MacOS, so you need to go through some extra setup on WSL to get it working.
 1. Install WSL
     - `wsl --install` `wsl --update`
     - `sudo apt update` `sudo apt install build-essential`
     - `sudo apt install python3 python3-venv python3-full`
-3. In "Turn Windows Features On or Off" > Enable Virtual Machine Platform and Windows Subsystem for Linux
+3. In "Turn Windows Features On or Off" > Enable Virtual Machine Platform and Windows Subsystem for Linux, Restart if needed.
 4. In "WSL Settings" > Networking > Networking Mode > Mirrored
-a. Restart if needed.
 5. Using WSL, Install s(CASP):
     - `curl https://ciao-lang.org/boot -sSfL | sh`
-    -  `ciao get gitlab.software.imdea.org/ciao-lang/sCASP`
-    -  `scasp --update`
+    - `ciao get gitlab.software.imdea.org/ciao-lang/sCASP`
+    - `scasp --update`
 6. Clone the VECSR Repository
+    - Do `git add --chmod=+x scasp_knowledge_base` before cloning or the scripts might not work.
 7. In VECSR the folder > Clone the Virtualhome Repository (API)
 8. Make a Python VENV and install all pip / libs (both VECSR and VirtualHome)
+    - cd into vecsr\virtualhome\, pip install -e .
+	- also vecsr\ requirments.txt
 9. On the Windows side, download VirtualHome's Windows Exe to somewhere like Program Files, and run it.
     - You can verify if it's open in WSL w/ `ip route | grep default` for `8080`
 10. Run main_virtualhome.py
@@ -100,12 +102,21 @@ the first suggested action.
 
 ## How to Run with AirSim
 AirSim will need to be run as instructed in the [AirSim documentation](https://microsoft.github.io/AirSim/build_windows/). 
+
 Because AirSim is no longer being supported, it is difficult to run on anything other than Windows. As s(CASP) can
 only be run easily on Unix-based machines, we provide an option to run VECSR in a server-client connection, where 
 VECSR can function as a s(CASP) server on a s(CASP)-enabled machine and an AirSim-connected client on a Windows machine
 using a simple TCP socket. 
 
 To run VECSR as a s(CASP) server, use scasp_server.py, and to run on a machine with AirSim run main_airsim.py.
+
+If you try building yourself, ensure your Visual Studio 2022 has .net, Windows build tools, C++ frameworks, Game Development bundles, and try adding these lines to `C:\Program Files\Epic Games\UE_4.27\Engine\Config\BaseEngine.ini`, else we recommend using the prebuilt binaries given by Microsoftrecommend
+```
+[PlatformPaths]
+UnrealBuildTool=Engine/Binaries/DotNET/UnrealBuildTool.exe
+```
+
+In the future, we plan to port VECSR-A to Project Airsim.
 
 ### Simulation Video
 A demonstration video is available and linked here: [Video](https://drive.google.com/file/d/1dLcAfDx14L6Kk7PUr7tecDVNdlx4ec46/view?usp=sharing)
@@ -138,4 +149,3 @@ a useful way to acknowledge your use is in your README.
 # License 
 GNU @ Alexis R. Tudor
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
-
